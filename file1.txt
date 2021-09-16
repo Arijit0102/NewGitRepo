@@ -1,0 +1,2451 @@
+UserForm 1:
+'Option Explicit
+
+
+Private Sub Aboutus_Click()
+    Unload SAPGLTOOL
+    Application.Visible = True
+    ThisWorkbook.Sheets("ABOUT US").Activate
+End Sub
+
+Private Sub Close_Tool_Click()
+Unload SAPGLTOOL
+ThisWorkbook.Worksheets("Config").Activate
+Application.Visible = True
+End Sub
+
+Private Sub CompensationDateSelection_Change()
+
+End Sub
+
+Private Sub CompensationDateSelection_Enter()
+    tb_enter Me.ActiveControl.Name
+End Sub
+
+Private Sub CompensationDateSelection_Exit(ByVal Cancel As MSForms.ReturnBoolean)
+    tb_exit Me.ActiveControl.Name
+End Sub
+
+Private Sub PeriodDateSelection_Change()
+
+End Sub
+
+Private Sub PeriodDateSelection_Enter()
+    tb_enter Me.ActiveControl.Name
+End Sub
+
+Private Sub PeriodDateSelection_Exit(ByVal Cancel As MSForms.ReturnBoolean)
+    tb_exit Me.ActiveControl.Name
+End Sub
+
+Private Sub ENVSelect_KeyPress(ByVal KeyAscii As MSForms.ReturnInteger)
+    KeyAscii = 0
+End Sub
+
+Private Sub Execute_Tool_Click()
+    
+    If (PeriodDateSelection.Value = "" Or CompensationDateSelection.Value = "" Or ENVSelect.Value = "ENVIRONMENT" Or SapFileSection.Value = "" Or SapBalFileSelection.Value = "") Then
+        Execute_Tool.Enabled = False
+        MsgBox ("Enter The Correct Details")
+    Else
+        Call Module1.Clear_Data
+        
+        ThisWorkbook.Worksheets("Config").Activate
+        Range("C3").Value = "SAPGL Detail Feed Daily"
+        Range("C3").WrapText = False
+        'Range("C3").EntireColumn.AutoFit
+        Range("C4").Value = "SAPGL Detail Feed EndOfDay"
+        Range("C4").WrapText = False
+        'Range("C4").EntireColumn.AutoFit
+        Range("D3").Value = PeriodDateSelection.Value
+        Range("D3").WrapText = False
+        'Range("D3").EntireColumn.AutoFit
+        Range("E3").Value = CompensationDateSelection.Value
+        Range("E3").WrapText = False
+        'Range("E3").EntireColumn.AutoFit
+        Range("F3").Value = ENVSelect.Value
+        Range("F3").WrapText = False
+        'Range("F3").EntireColumn.AutoFit
+        PGBAR.Show
+    End If
+
+
+End Sub
+Private Sub SAP_BAL_FILE_SELECTION_Click()
+Dim X As Variant
+Dim sheetPath1 As Variant
+Dim fd As Variant
+Dim getSheetName1 As String
+sheetPath1 = ActiveWorkbook.Path
+Set fd = Application.FileDialog(msoFileDialogFilePicker)
+With fd
+
+    'Add a filter that includes GIF and JPEG images and make it the first item in the list.
+     .Filters.Add "Notepad", "*.txt", 1
+     .FilterIndex = 1
+     .InitialFileName = sheetPath1
+     .Show
+End With
+getSheetName1 = fd.SelectedItems(1)
+        
+SapBalFileSelection.Value = getSheetName1
+
+ThisWorkbook.Worksheets("Config").Activate
+Range("B4").Value = ""
+Range("B4").Value = getSheetName1
+Range("B4").WrapText = True
+End Sub
+
+Private Sub SAP_FILE_SELECTION_Click()
+Dim X As Variant
+Dim sheetPath As Variant
+Dim fd As Variant
+Dim getSheetName As String
+sheetPath = ActiveWorkbook.Path
+Set fd = Application.FileDialog(msoFileDialogFilePicker)
+With fd
+
+    'Add a filter that includes GIF and JPEG images and make it the first item in the list.
+     .Filters.Add "Notepad", "*.txt", 1
+     .FilterIndex = 1
+     .InitialFileName = sheetPath
+     .Show
+End With
+getSheetName = fd.SelectedItems(1)
+        
+SapFileSection.Value = getSheetName
+
+ThisWorkbook.Worksheets("Config").Activate
+Range("B3").Value = ""
+Range("B3").Value = getSheetName
+Range("B3").WrapText = True
+
+'Unload SAPGLTOOL
+'Application.Visible = True
+End Sub
+
+Private Sub SapBalFileSelection_Change()
+
+End Sub
+
+Private Sub SapFileSection_Change()
+
+End Sub
+
+Private Sub UserForm_Initialize()
+
+HideBar Me
+
+ENVSelect.Value = "ENVIRONMENT"
+
+End Sub
+Private Sub UserForm_Activate()
+
+With ENVSelect
+    .AddItem "TST"
+    .AddItem "TST2"
+    .AddItem "TST3"
+    .AddItem "TST4"
+    .AddItem "DEV"
+    .AddItem "DEV3"
+End With
+SapFileSection.Enabled = False
+SapBalFileSelection.Enabled = False
+End Sub
+
+UserForm2:
+'Option Explicit
+
+Private Sub Text_Click()
+
+End Sub
+
+Private Sub UserForm_Activate()
+    PGBAR.Text.Caption = "0" & "% Completed"
+    Application.Wait (Now + TimeValue("00:00:02"))
+
+    Call Module2.MainFunction
+    Unload PGBAR
+    Unload SAPGLTOOL
+    ThisWorkbook.Sheets("SAP_DAILY_TEMPORARY2").Visible = False
+    ThisWorkbook.Sheets("SAP_DAILY_TEMPORARY").Visible = False
+    ThisWorkbook.Worksheets("BALANCE SUMMARY").Activate
+    Application.Visible = True
+
+End Sub
+
+Private Sub UserForm_Click()
+    
+End Sub
+
+Private Sub UserForm_Initialize()
+    HideBar Me
+End Sub
+
+Module 3:
+Option Explicit
+
+Sub Button1_Click()
+ThisWorkbook.Worksheets("Config").Activate
+End Sub
+Sub Button2_Click()
+ThisWorkbook.Worksheets("MISS MATCH RESULT").Activate
+End Sub
+Sub Button3_Click()
+ThisWorkbook.Worksheets("SAP_FEED Vs CREDIT RESULT").Activate
+End Sub
+Sub Button4_Click()
+ThisWorkbook.Worksheets("CREDIT Vs SAP_FEED RESULT").Activate
+End Sub
+Sub Button8_Click()
+ThisWorkbook.Worksheets("ABOUT US").Activate
+End Sub
+
+
+Sub BalanceSummaryCheck()
+Dim endRow1 As Long
+Dim endRow2 As Long
+Dim i As Long
+Dim j As Long
+Dim objResultDetailsSheet
+
+ThisWorkbook.Sheets("BALANCE SUMMARY").Visible = True
+Set objResultDetailsSheet = ThisWorkbook.Sheets("BALANCE SUMMARY")
+endRow1 = objResultDetailsSheet.Cells(objResultDetailsSheet.Rows.Count, "A").End(xlUp).Row
+endRow2 = objResultDetailsSheet.Cells(objResultDetailsSheet.Rows.Count, "F").End(xlUp).Row
+
+For i = 4 To endRow1
+'Application.WorksheetFunction.IsNA(Application.VLookup(objResultDetailsSheet.Cells(counter, 15), objResultDetailsSheet.Range("P:P"), 1, False))
+    'If CStr(objResultDetailsSheet.Cells(i, 1)) = CStr(objResultDetailsSheet.Cells(i, 6)) Then
+   
+    If Application.WorksheetFunction.IsNA(Application.VLookup(objResultDetailsSheet.Cells(i, 1), objResultDetailsSheet.Range("F:F"), 1, False)) Then
+    
+        If CStr(objResultDetailsSheet.Cells(i, 2)) = CStr(objResultDetailsSheet.Cells(i, 7)) Then
+            objResultDetailsSheet.Cells(i, 2).Font.Color = RGB(0, 128, 0)
+            objResultDetailsSheet.Cells(i, 7).Font.Color = RGB(0, 128, 0)
+        Else
+            objResultDetailsSheet.Cells(i, 2).Font.Color = RGB(255, 0, 0)
+            objResultDetailsSheet.Cells(i, 7).Font.Color = RGB(255, 0, 0)
+        End If
+        
+        If CStr(objResultDetailsSheet.Cells(i, 3)) = CStr(objResultDetailsSheet.Cells(i, 8)) Then
+            objResultDetailsSheet.Cells(i, 3).Font.Color = RGB(0, 128, 0)
+            objResultDetailsSheet.Cells(i, 8).Font.Color = RGB(0, 128, 0)
+        Else
+            objResultDetailsSheet.Cells(i, 3).Font.Color = RGB(255, 0, 0)
+            objResultDetailsSheet.Cells(i, 8).Font.Color = RGB(255, 0, 0)
+        End If
+    
+    End If
+    
+    If CStr(objResultDetailsSheet.Cells(i, 1)) = CStr(objResultDetailsSheet.Cells(i, 6)) Then
+        If CStr(objResultDetailsSheet.Cells(i, 2)) = CStr(objResultDetailsSheet.Cells(i, 7)) Then
+            objResultDetailsSheet.Cells(i, 2).Font.Color = RGB(0, 128, 0)
+            objResultDetailsSheet.Cells(i, 7).Font.Color = RGB(0, 128, 0)
+        Else
+            objResultDetailsSheet.Cells(i, 2).Font.Color = RGB(255, 0, 0)
+            objResultDetailsSheet.Cells(i, 7).Font.Color = RGB(255, 0, 0)
+        End If
+        
+        If CStr(objResultDetailsSheet.Cells(i, 3)) = CStr(objResultDetailsSheet.Cells(i, 8)) Then
+            objResultDetailsSheet.Cells(i, 3).Font.Color = RGB(0, 128, 0)
+            objResultDetailsSheet.Cells(i, 8).Font.Color = RGB(0, 128, 0)
+        Else
+            objResultDetailsSheet.Cells(i, 3).Font.Color = RGB(255, 0, 0)
+            objResultDetailsSheet.Cells(i, 8).Font.Color = RGB(255, 0, 0)
+        End If
+    End If
+    
+Next
+
+For j = 4 To endRow2
+
+    If Application.WorksheetFunction.IsNA(Application.VLookup(objResultDetailsSheet.Cells(j, 6), objResultDetailsSheet.Range("A:A"), 1, False)) Then
+    
+        If CStr(objResultDetailsSheet.Cells(j, 2)) = CStr(objResultDetailsSheet.Cells(j, 7)) Then
+            objResultDetailsSheet.Cells(j, 2).Font.Color = RGB(0, 0, 0)
+            objResultDetailsSheet.Cells(j, 7).Font.Color = RGB(0, 0, 0)
+        Else
+            objResultDetailsSheet.Cells(j, 2).Font.Color = RGB(255, 0, 0)
+            objResultDetailsSheet.Cells(j, 7).Font.Color = RGB(255, 0, 0)
+        End If
+        
+        If CStr(objResultDetailsSheet.Cells(j, 3)) = CStr(objResultDetailsSheet.Cells(j, 8)) Then
+            objResultDetailsSheet.Cells(j, 3).Font.Color = RGB(0, 0, 0)
+            objResultDetailsSheet.Cells(j, 8).Font.Color = RGB(0, 0, 0)
+        Else
+            objResultDetailsSheet.Cells(j, 3).Font.Color = RGB(255, 0, 0)
+            objResultDetailsSheet.Cells(j, 8).Font.Color = RGB(255, 0, 0)
+        End If
+    
+    End If
+    
+    If CStr(objResultDetailsSheet.Cells(j, 1)) = CStr(objResultDetailsSheet.Cells(j, 6)) Then
+        If CStr(objResultDetailsSheet.Cells(j, 2)) = CStr(objResultDetailsSheet.Cells(j, 7)) Then
+            objResultDetailsSheet.Cells(j, 2).Font.Color = RGB(0, 0, 0)
+            objResultDetailsSheet.Cells(j, 7).Font.Color = RGB(0, 0, 0)
+        Else
+            objResultDetailsSheet.Cells(j, 2).Font.Color = RGB(255, 0, 0)
+            objResultDetailsSheet.Cells(j, 7).Font.Color = RGB(255, 0, 0)
+        End If
+        
+        If CStr(objResultDetailsSheet.Cells(j, 3)) = CStr(objResultDetailsSheet.Cells(j, 8)) Then
+            objResultDetailsSheet.Cells(j, 3).Font.Color = RGB(0, 0, 0)
+            objResultDetailsSheet.Cells(j, 8).Font.Color = RGB(0, 0, 0)
+        Else
+            objResultDetailsSheet.Cells(j, 3).Font.Color = RGB(255, 0, 0)
+            objResultDetailsSheet.Cells(j, 8).Font.Color = RGB(255, 0, 0)
+        End If
+    End If
+
+Next
+
+End Sub
+
+Module 2:
+
+'Option Explicit
+
+Sub OpenUserForm()
+
+Application.Visible = False
+SAPGLTOOL.Show
+
+End Sub
+
+Sub MainFunction()
+Dim strPath As String
+Dim MSheet As String
+
+strPath1 = ThisWorkbook.Worksheets("Config").Cells(3, 2)
+MSheet1 = ThisWorkbook.Worksheets("Config").Cells(3, 3)
+strPath2 = ThisWorkbook.Worksheets("Config").Cells(4, 2)
+MSheet2 = ThisWorkbook.Worksheets("Config").Cells(4, 3)
+Call SapDetailDailyDetailResult
+Call SapDailyBalanceResult
+ThisWorkbook.Worksheets("SAP DAILY DETAIL").Activate
+Call DbConnection
+Call Module1.ProgressBar_Part1
+Call Module2.Convert_CreditDetails_to_SAPGL_Format
+If Format(ThisWorkbook.Sheets("Config").Cells(3, 5), "dddd") <> "Monday" Then
+    Call Module2.Capture_ReprocessData
+    Call Module2.Convert_Reprocess_CreditDetails_to_SAPGL_Format
+    Call Module2.DataPut_SAP_Vs_Credit
+    
+Else
+    Call Module2.DataPut_SAP_Vs_Credit
+    
+End If
+Call Module1.ProgressBar_Part2
+Call Module2.DataPut_Credit_Vs_SAP
+Call Module2.SAP_Vs_Credit_Compare
+Call Module2.Missmatch_SAP_CREDIT
+Call Module2.Border
+Call Module1.ProgressBar_Part3
+Call Module2.Credit_Vs_SAP_Compare
+Call Module2.Missmatch_CREDIT_SAP
+Call Module2.Border1
+Call Module2.Debit_Credit_Groupping
+Call Module3.BalanceSummaryCheck
+Call Module2.Output_Report
+Call Module1.ProgressBar_Part4
+End Sub
+
+Sub SapDetailDailyDetailResult()
+
+Dim objFSO As Object
+Dim objTF As Object
+Dim strIn 'As String
+Dim strPath1 As String
+Dim strLength As Long
+Dim intNoOfIteration As Integer
+Dim CurrPosition As Double
+Dim FieldLen As Integer
+Dim ColumnName As String
+Dim m As Integer
+Dim k As Integer
+Dim l As Integer
+Dim N As Integer
+Dim flag As Integer
+Dim MSheet1 As String
+Dim AGL_Entry_Count As Integer
+Dim USL_Entry_Count As Integer
+AGL_Entry_Count = 0
+USL_Entry_Count = 0
+
+strPath1 = ThisWorkbook.Worksheets("Config").Cells(3, 2)
+
+Set objFSO = CreateObject("Scripting.FileSystemObject")
+Set objTF = objFSO.OpenTextFile(strPath1, 1)
+strIn = objTF.ReadAll
+
+MSheet1 = ThisWorkbook.Worksheets("Config").Cells(3, 3)
+
+If MSheet1 <> "" Then
+
+'NEW SECTION START FOR SAP GL DAILY
+
+    m = 3
+Do While Not IsEmpty(ThisWorkbook.Worksheets(MSheet1).Cells(m, 5)) ' To get the max length of the single record set
+   strLength = ThisWorkbook.Worksheets(MSheet1).Cells(m, 5)
+   m = m + 1
+Loop
+intNoOfIteration = Round(Len(strIn) / strLength, 0)
+intNoOfIteration = intNoOfIteration + 1 ' To handle the Control line.
+
+CurrPosition = 1
+k = 3
+l = 2
+N = 1
+flag = 0
+AGLStart = 0
+USLStart = 0
+For i = 1 To intNoOfIteration ' Line split using max length
+    
+    Do While Not IsEmpty(ThisWorkbook.Worksheets(MSheet1).Cells(k, 3))  ' to loop until the last column and split the file into columns
+        If i = 1 Then ' to restict the header creation for only one time
+            ColumnName = Trim(ThisWorkbook.Worksheets(MSheet1).Cells(k, 1))
+            ThisWorkbook.Worksheets("SAP DAILY DETAIL").Cells(1, N) = ColumnName
+            ThisWorkbook.Worksheets("SAP DAILY DETAIL").Columns(N).ColumnWidth = 20
+            With ThisWorkbook.Worksheets("SAP DAILY DETAIL").Cells(1, N)
+                .NumberFormat = "@"
+                .Font.Bold = True
+                .Font.Size = 14
+                .Font.Color = vbBlue
+            End With
+        End If
+        
+        If MSheet1 Like "SAPGL*" And MSheet1 <> "SAPGL Detail Feed Daily" And Mid(strIn, CurrPosition, 3) = "H03" Then
+        
+            flag = 1
+            k = k + 1
+            N = N + 1
+         
+        ElseIf MSheet1 Like "SAPGL*" And MSheet1 = "SAPGL Detail Feed Daily" And Mid(strIn, CurrPosition, 3) = "H03" Then
+        
+            If Mid(strIn, CurrPosition, 9) = "H03CALUSL" Then
+                AGL_Entry_Count = 0
+                USL_Entry_Count = 0
+                ss = i
+                'MsgBox ss
+            End If
+            
+            
+            
+            flag = 2
+            k = k + 1
+            N = N + 1
+            
+        ElseIf MSheet1 Like "SAPGL*" And N = 1 And Mid(strIn, CurrPosition, 1) = "C" Then
+             
+            DebitAmount = CDbl(Mid(strIn, CurrPosition + 1, 20))
+            CreditAmount = CDbl(Mid(strIn, CurrPosition + 21, 20))
+            ThisWorkbook.Worksheets("SUMMARY").Activate
+            ThisWorkbook.Worksheets("SUMMARY").Cells(1, 1) = "TOTAL DEBIT COUNT"
+            ThisWorkbook.Worksheets("SUMMARY").Cells(2, 1) = DebitAmount
+            ThisWorkbook.Worksheets("SUMMARY").Cells(1, 2) = "TOTAL CREDIT COUNT"
+            ThisWorkbook.Worksheets("SUMMARY").Cells(2, 2) = CreditAmount
+
+            ThisWorkbook.Worksheets("SAP DAILY DETAIL").Activate
+            'MsgBox ss
+            objTF.Close
+            Exit For
+            
+        Else
+        
+            FieldLen = ThisWorkbook.Worksheets(MSheet1).Cells(k, 3)
+            ThisWorkbook.Worksheets("SAP DAILY DETAIL").Cells(l, N).NumberFormat = "@"
+            ThisWorkbook.Worksheets("SAP DAILY DETAIL").Cells(l, N) = Mid(strIn, CurrPosition, FieldLen)
+            CurrPosition = CurrPosition + FieldLen
+            k = k + 1
+            N = N + 1
+            flag = 0
+        
+        End If
+       
+    Loop
+    k = 3
+    N = 1
+    
+    If flag = 1 Then
+        CurrPosition = CurrPosition + 389
+        l = l
+    
+    ElseIf flag = 2 Then
+        CurrPosition = CurrPosition + 389 'Change From 390 to 389
+        l = l
+    Else
+        CurrPosition = CurrPosition + 1 'Change From 2 to 1
+        l = l + 1
+    End If
+Next i
+'Summary
+ThisWorkbook.Worksheets("SAP DAILY DETAIL").Activate
+ThisWorkbook.Worksheets("SAP DAILY DETAIL").Cells(1, 71) = "COMPANY CODE"
+ThisWorkbook.Worksheets("SAP DAILY DETAIL").Cells(1, 71).NumberFormat = "@"
+ThisWorkbook.Worksheets("SAP DAILY DETAIL").Cells(1, 71).Font.Bold = True
+ThisWorkbook.Worksheets("SAP DAILY DETAIL").Cells(1, 71).Font.Size = 14
+ThisWorkbook.Worksheets("SAP DAILY DETAIL").Cells(1, 71).Font.Color = vbBlue
+cc = ThisWorkbook.Worksheets("SAP DAILY DETAIL").Cells(ThisWorkbook.Worksheets("SAP DAILY DETAIL").Rows.Count, "A").End(xlUp).Row
+    If CStr(ss <> "") Then
+        For a = ss To cc
+            ThisWorkbook.Worksheets("SAP DAILY DETAIL").Cells(a, 71) = "USL"
+        Next
+        If CStr(ThisWorkbook.Worksheets("SAP DAILY DETAIL").Cells(ss - 1, 71) = "") Then
+            For a = 2 To ss - 1
+                ThisWorkbook.Worksheets("SAP DAILY DETAIL").Cells(a, 71) = "AGL"
+            Next
+        End If
+    Else
+        For a = 2 To cc
+            ThisWorkbook.Worksheets("SAP DAILY DETAIL").Cells(a, 71) = "AGL"
+        Next
+    End If
+Else
+    MsgBox "Please select the Mapping before proceed!"
+    Exit Sub
+End If
+
+
+End Sub
+
+Sub SapDailyBalanceResult()
+
+Dim objFSO As Object
+Dim objTF As Object
+Dim strIn 'As String
+Dim strPath2 As String
+Dim strLength As Long
+Dim intNoOfIteration As Long
+Dim CurrPosition As Double
+Dim FieldLen As Integer
+Dim ColumnName As String
+Dim m As Integer
+Dim k As Integer
+Dim l As Integer
+Dim N As Integer
+Dim flag As Integer
+Dim MSheet2 As String
+intNoOfIteration = 0
+strPath2 = ThisWorkbook.Worksheets("Config").Cells(4, 2)
+
+Set objFSO = CreateObject("Scripting.FileSystemObject")
+Set objTF = objFSO.OpenTextFile(strPath2, 1)
+strIn = objTF.ReadAll
+
+MSheet2 = ThisWorkbook.Worksheets("Config").Cells(4, 3)
+If MSheet2 <> "" Then
+
+      m = 3
+Do While Not IsEmpty(ThisWorkbook.Worksheets(MSheet2).Cells(m, 5)) ' To get the max length of the single record set
+   strLength = ThisWorkbook.Worksheets(MSheet2).Cells(m, 5)
+   m = m + 1
+Loop
+strLength = strLength + 1
+
+intNoOfIteration = Round(Len(strIn) / strLength, 0)
+intNoOfIteration = intNoOfIteration + 1 'To Handle the control line.
+
+CurrPosition = 1
+k = 3
+l = 2
+N = 1
+flag = 0
+
+For i = 1 To intNoOfIteration ' Line split using max length
+
+
+
+    Do While Not IsEmpty(ThisWorkbook.Worksheets(MSheet2).Cells(k, 3))  ' to loop until the last column and split the file into columns
+        If i = 1 Then ' to restict the header creation for only one time
+            ColumnName = Trim(ThisWorkbook.Worksheets(MSheet2).Cells(k, 1))
+            ThisWorkbook.Worksheets("SAP DAILY BALANCE").Cells(1, N) = ColumnName
+            ThisWorkbook.Worksheets("SAP DAILY BALANCE").Columns(N).ColumnWidth = 20
+            With ThisWorkbook.Worksheets("SAP DAILY BALANCE").Cells(1, N)
+                .NumberFormat = "@"
+                .Font.Bold = True
+                .Font.Size = 14
+                .Font.Color = vbBlue
+            End With
+        End If
+        
+        If MSheet2 Like "SAPGL*" And MSheet2 <> "SAPGL Detail Feed EndOfDay" And Mid(strIn, CurrPosition, 3) = "H03" Then
+        
+            flag = 1
+            k = k + 1
+            N = N + 1
+         
+        ElseIf MSheet2 Like "SAPGL*" And MSheet2 = "SAPGL Detail Feed EndOfDay" And Mid(strIn, CurrPosition, 3) = "H03" Then
+        
+        
+            flag = 2
+            k = k + 1
+            N = N + 1
+                
+        ElseIf MSheet2 Like "SAPGL*" And N = 1 And Mid(strIn, CurrPosition, 1) = "C" Then
+                
+            ThisWorkbook.Worksheets("SUMMARY").Cells(4, 1) = "SAP_BAL1_D"
+            ThisWorkbook.Worksheets("SUMMARY").Cells(4, 2) = "SAP_BAL1_C"
+           ThisWorkbook.Worksheets("SUMMARY").Cells(5, 1) = CDbl(Mid(strIn, CurrPosition + 1, 20))
+            ThisWorkbook.Worksheets("SUMMARY").Cells(5, 2) = CDbl(Mid(strIn, CurrPosition + 21, 20))
+            
+                           Exit Sub
+        
+        Else
+        
+            FieldLen = ThisWorkbook.Worksheets(MSheet2).Cells(k, 3)
+            ThisWorkbook.Worksheets("SAP DAILY BALANCE").Cells(l, N).NumberFormat = "@"
+            ThisWorkbook.Worksheets("SAP DAILY BALANCE").Cells(l, N) = Mid(strIn, CurrPosition, FieldLen)
+            CurrPosition = CurrPosition + FieldLen
+            k = k + 1
+            N = N + 1
+            flag = 0
+        
+        End If
+       
+    Loop
+    k = 3
+    N = 1
+    
+    If flag = 1 Then
+        CurrPosition = CurrPosition + 389
+        l = l
+    
+    ElseIf flag = 2 Then
+        CurrPosition = CurrPosition + 389
+        l = l
+    Else
+        CurrPosition = CurrPosition + 1
+        l = l + 1
+    End If
+
+Next i
+
+
+objTF.Close
+
+Else
+    MsgBox "Please select the Mapping before proceed!"
+    Exit Sub
+End If
+
+End Sub
+
+Sub DbConnection()
+
+Dim dbconn As ADODB.Connection
+Dim rs As ADODB.Recordset
+Dim rs1 As ADODB.Recordset
+Dim DBFullName As Variant
+Dim policydetials As Variant
+Dim creditdetails As Variant
+Dim iCols As Integer
+Dim iCols1 As Integer
+Dim Cm As ADODB.Command
+Dim Cm1 As ADODB.Command
+Dim find1 As Variant
+Dim find2 As Variant
+Dim inputCompDate As Variant
+Dim inputPeriod As Variant
+Dim TargetRange As Variant
+Dim TargetRange1 As Variant
+Dim actualRate
+Dim strEffDate
+Dim strTransactiondate
+Dim strPrimiumDuration
+Dim strProductCode, strAgentType, strPrmCat, PrmDuration, ContractCode, ProductType
+Dim temp1 As Variant
+Dim Temp2 As Variant
+Dim Temp3 As Variant
+Dim Temp4 As Variant
+Dim Temp5 As Variant
+
+
+Worksheets("DatabaseQuery").Visible = True
+
+'######Database Connection Creation######'
+Set dbconn = New ADODB.Connection
+Set rs = New ADODB.Recordset
+
+'######Retreive Policy Details#########
+
+'Input From User'
+ThisWorkbook.Sheets("Config").Activate
+inputCompDate = Range("E3").Value
+'inputCompDate2 = Chr(39) & inputCompDate & Chr(39)
+
+inputPeriod = Range("D3").Value
+'inputPeriod2 = "'inputPeriod'"
+
+'MsgBox inputPeriod
+'MsgBox inputCompDate
+If Range("F3").Value = "TST4" Then
+    
+    DBFullName = "Provider=OraOLEDB.Oracle;Data Source=//10.28.71.134:1521/AIGITST4;User ID=aigiextrw;Password=ee7waeSh"
+
+ElseIf Range("F3").Value = "TST" Then
+    
+    DBFullName = "Provider=OraOLEDB.Oracle;Data Source=//10.28.71.24:1521/AIGITST;User ID=aigiextrw;Password=miphah4I"
+    
+ElseIf Range("F3").Value = "TST2" Then
+    
+    DBFullName = "Provider=OraOLEDB.Oracle;Data Source=//10.28.71.114:1521/AIGITST2;User ID=aigiextrw;Password=Phahheu9"
+       
+ElseIf Range("F3").Value = "TST3" Then
+
+    DBFullName = "Provider=OraOLEDB.Oracle;Data Source=//10.28.71.124:1521/AIGITST3;User ID=aigiextrw;Password=nipe9Sap"
+    
+ElseIf Range("F3").Value = "DEV" Then
+
+    DBFullName = "Provider=OraOLEDB.Oracle;Data Source=//10.28.71.14:1521/AIGIDEV;User ID=aigiextrw;Password=oCiew4na"
+    
+ElseIf Range("F3").Value = "DEV3" Then
+
+    DBFullName = "Provider=OraOLEDB.Oracle;Data Source=//10.28.71.94:1521/AIGIDEV3;User ID=aigiextrw;Password=wee7ahTu"
+
+End If
+   
+   ThisWorkbook.Sheets("SAP_DAILY_TEMPORARY").Visible = True
+    
+    'Run Database Query'
+    ThisWorkbook.Sheets("SAP_DAILY_TEMPORARY").Activate
+    
+    Set TargetRange = Range("A1")
+    dbconn.Open (DBFullName)
+    
+    ThisWorkbook.Sheets("Config").Activate
+        
+        ThisWorkbook.Sheets("DatabaseQuery").Activate
+'        Range("B2").Value = Range("A2").Value
+'        find2 = "PRSQ"
+'        Range("B2").Replace what:=find2, Replacement:=inputPeriod
+'
+'        Range("C2").Value = Range("B2").Value
+'        find1 = "CMPDT"
+'        Range("C2").Replace what:=find1, Replacement:=inputCompDate
+    Temp3 = Range("A2").Value
+    Temp4 = Replace(Temp3, "PRSQ", inputPeriod)
+    Range("B2").Value = Temp4
+    
+    'Range("C3").Value = Range("B3").Value
+    'ActiveSheet.Range("C3").Select
+    'find1 = "CMPDT"
+    'Range("C3").Replace what:=find1, Replacement:=inputCompDate
+    
+    Temp4 = Range("B2").Value
+    Temp5 = Replace(Temp4, "CMPDT", inputCompDate)
+    Range("C2").Value = Temp5
+        
+    creditdetails = ThisWorkbook.Sheets("DatabaseQuery").Cells(2, 3)
+    
+    
+    'Execute The Query
+    Set Cm = New ADODB.Command
+        With Cm
+            .ActiveConnection = dbconn
+            .CommandText = creditdetails
+            .CommandType = adCmdText
+    
+    Set rs = Cm.Execute
+    End With
+    
+    'Print The Column Names'
+    For iCols = 0 To rs.Fields.Count - 1
+        TargetRange.Offset(0, iCols).Value = rs.Fields(iCols).Name
+    Next iCols
+    
+    'Print The Records'
+    TargetRange.Offset(1, 0).CopyFromRecordset rs
+    TargetRange.Offset(1, 0).WrapText = False
+    TargetRange.Offset(1, 0).CurrentRegion.EntireColumn.AutoFit
+    
+    Set rs = Nothing
+    dbconn.Close
+    Worksheets("DatabaseQuery").Visible = False
+    
+    ThisWorkbook.Sheets("SAP_DAILY_TEMPORARY").Activate
+    Range("G:G").NumberFormat = "mm/dd/yyyy"
+
+
+
+
+''## ReProcess Credits******************************************************************
+If Format(ThisWorkbook.Sheets("Config").Cells(3, 5), "dddd") <> "Monday" Then
+    ThisWorkbook.Sheets("SAP_DAILY_TEMPORARY2").Activate
+
+    Set TargetRange = Range("A1")
+    dbconn.Open (DBFullName)
+
+    ThisWorkbook.Sheets("Config").Activate
+
+    ThisWorkbook.Sheets("DatabaseQuery").Activate
+'    Range("B3").Value = Range("A3").Value
+'    find2 = "PRSQ"
+'    Range("B3").Replace what:=find2, Replacement:=inputPeriod
+'
+    Temp3 = Range("A3").Value
+    Temp4 = Replace(Temp3, "PRSQ", inputPeriod)
+    Range("B3").Value = Temp4
+
+    creditdetails1 = ThisWorkbook.Sheets("DatabaseQuery").Cells(3, 2)
+    Set Cm = New ADODB.Command
+    With Cm
+        .ActiveConnection = dbconn
+        .CommandText = creditdetails1
+        .CommandType = adCmdText
+
+    Set rs = Cm.Execute
+    End With
+    'MsgBox rs
+    'Print The Column Names'
+    For iCols = 0 To rs.Fields.Count - 1
+        TargetRange.Offset(0, iCols).Value = rs.Fields(iCols).Name
+    Next iCols
+
+    'Print The Records'
+    TargetRange.Offset(1, 0).CopyFromRecordset rs
+    TargetRange.Offset(1, 0).WrapText = False
+    TargetRange.Offset(1, 0).CurrentRegion.EntireColumn.AutoFit
+
+    Set rs = Nothing
+    dbconn.Close
+    Worksheets("DatabaseQuery").Visible = False
+    ThisWorkbook.Sheets("SAP_DAILY_TEMPORARY2").Activate
+    Range("I:I").NumberFormat = "mm/dd/yyyy"
+    Set objResultDetailsSheet = ThisWorkbook.Sheets("SAP_DAILY_TEMPORARY2")
+    endRow1 = objResultDetailsSheet.Cells(objResultDetailsSheet.Rows.Count, "A").End(xlUp).Row
+    
+    Set TargetRange = Range("A1")
+    dbconn.Open (DBFullName)
+
+    ThisWorkbook.Sheets("Config").Activate
+
+    ThisWorkbook.Sheets("DatabaseQuery").Activate
+'    Range("B4").Value = Range("A4").Value
+'    find2 = "PRSQ"
+'    Range("B4").Replace what:=find2, Replacement:=inputPeriod
+    
+    Temp3 = Range("A4").Value
+    Temp4 = Replace(Temp3, "PRSQ", inputPeriod)
+    Range("B4").Value = Temp4
+
+    
+    creditdetails1 = ThisWorkbook.Sheets("DatabaseQuery").Cells(4, 2)
+    Set Cm = New ADODB.Command
+    With Cm
+        .ActiveConnection = dbconn
+        .CommandText = creditdetails1
+        .CommandType = adCmdText
+
+    Set rs = Cm.Execute
+    End With
+
+    'Print The Column Names'
+    For iCols = 0 To rs.Fields.Count - 1
+        TargetRange.Offset(0, iCols + 17).Value = rs.Fields(iCols).Name
+    Next iCols
+
+    'Print The Records'
+    TargetRange.Offset(1, 17).CopyFromRecordset rs
+    TargetRange.Offset(1, 17).WrapText = False
+    TargetRange.Offset(1, 17).CurrentRegion.EntireColumn.AutoFit
+
+    Set rs = Nothing
+    dbconn.Close
+    Worksheets("DatabaseQuery").Visible = False
+    ThisWorkbook.Sheets("SAP_DAILY_TEMPORARY2").Activate
+    Range("I:I").NumberFormat = "mm/dd/yyyy"
+    
+End If
+
+End Sub
+Sub Convert_CreditDetails_to_SAPGL_Format()
+
+Dim endRow1 As Long
+Dim acrow As Long
+Dim objResultDetailsSheet
+
+ThisWorkbook.Sheets("SAP_DAILY_TEMPORARY").Visible = True
+Set objResultDetailsSheet = ThisWorkbook.Sheets("SAP_DAILY_TEMPORARY")
+endRow1 = objResultDetailsSheet.Cells(objResultDetailsSheet.Rows.Count, "A").End(xlUp).Row
+
+objResultDetailsSheet.Cells(1, 20) = "POLICY NUMBER"
+objResultDetailsSheet.Cells(1, 21) = "TEMP AMOUNT"
+objResultDetailsSheet.Cells(1, 22) = "ACCOUNT NO"
+objResultDetailsSheet.Cells(1, 23) = "CREDIT_DEBIT"
+objResultDetailsSheet.Cells(1, 24) = "EARNING AGENT"
+objResultDetailsSheet.Cells(1, 25) = "EARNING TAX ID"
+objResultDetailsSheet.Cells(1, 26) = "PAID AGENT"
+objResultDetailsSheet.Cells(1, 27) = "PAID TAX ID"
+objResultDetailsSheet.Cells(1, 28) = "COMMISSION AMOUNT"
+objResultDetailsSheet.Cells(1, 29) = "COMPENSATION DATE"
+objResultDetailsSheet.Cells(1, 30) = "COMPANY CODE"
+
+For q = 20 To 30
+    objResultDetailsSheet.Cells(1, q).WrapText = False
+    objResultDetailsSheet.Cells(1, q).CurrentRegion.EntireColumn.AutoFit
+    objResultDetailsSheet.Cells(1, q).VerticalAlignment = xlCenter
+    objResultDetailsSheet.Cells(1, q).HorizontalAlignment = xlCenter
+Next
+
+acrow = 2
+
+For i = 2 To endRow1
+
+If i = 80 Then
+xxxxxx = 10
+End If
+    'Print First Row Based on Credit/ Debit Amount
+    objResultDetailsSheet.Cells(acrow, 20).NumberFormat = "@"
+    objResultDetailsSheet.Cells(acrow, 20) = CStr(objResultDetailsSheet.Cells(i, 1)) 'Policy No
+    objResultDetailsSheet.Cells(acrow, 21).NumberFormat = "@"
+    objResultDetailsSheet.Cells(acrow, 21) = CStr(objResultDetailsSheet.Cells(i, 4)) 'Amount
+    objResultDetailsSheet.Cells(acrow, 22).NumberFormat = "@"
+    objResultDetailsSheet.Cells(acrow, 22) = CStr(objResultDetailsSheet.Cells(i, 5)) 'Account No 1
+    CompDate = Format(objResultDetailsSheet.Cells(i, 7), "YYYYMMDD")
+        
+    'Earning AGENT ID Formatting in First Row Based on Credit/Debit
+    earningagentidtemp1 = CStr(objResultDetailsSheet.Cells(i, 2))
+    earningagentidtemp7 = Left(earningagentidtemp1, 3) ' AGL and USL
+    earningagentidtemp2 = Left(earningagentidtemp1, 4) '1st Four Character(AGL- Or USL-) of AGENT ID
+    If CStr(earningagentidtemp2) = "AGL-" Or CStr(earningagentidtemp2) = "USL-" Then
+        earningagentidtemp3 = Replace(earningagentidtemp1, earningagentidtemp2, "") 'Replace 1st Four Character(AGL- Or USL-) of AGENT ID with Blank
+        earningagentidtemp4 = InStr(earningagentidtemp3, "-") 'Pick the Level of the Agent ID after replacing
+        If earningagentidtemp4 <> 0 Then
+            earningagentidtemp5 = Right(earningagentidtemp3, 3)
+            earningagentidtemp6 = CStr(earningagentidtemp3)
+            objResultDetailsSheet.Cells(acrow, 24).NumberFormat = "@"
+            objResultDetailsSheet.Cells(acrow, 24) = CStr(Replace(earningagentidtemp6, earningagentidtemp5, "))
+            
+        Else
+            objResultDetailsSheet.Cells(acrow, 24).NumberFormat = "@
+            objResultDetailsSheet.Cells(acrow, 24) = CStr(earningagentidtemp3)
+        End If
+    Else
+        objResultDetailsSheet.Cells(acrow, 24).NumberFormat = "@"
+        objResultDetailsSheet.Cells(acrow, 24) = CStr(earningagentidtemp1)
+    End If
+    'Earning AGENT TAXID Formatting in First Row Based on Credit/Debit
+    objResultDetailsSheet.Cells(acrow, 25).NumberFormat = "@"
+    objResultDetailsSheet.Cells(acrow, 25) = CStr(objResultDetailsSheet.Cells(i, 8)) 'EARNING TAX ID
+    
+    objResultDetailsSheet.Cells(acrow, 29).NumberFormat = "@"
+    objResultDetailsSheet.Cells(acrow, 29) = CStr(CompDate)
+    objResultDetailsSheet.Cells(acrow, 30).NumberFormat = "@" ' AGL USL COUNT
+    objResultDetailsSheet.Cells(acrow, 30) = CStr(earningagentidtemp7)
+    
+    'Paid AGENT ID Formatting in Second Row Based on Credit/Debit
+    paidagentidtemp = objResultDetailsSheet.Cells(i, 9)
+    If CStr(paidagentidtemp) <> "" Then
+        paidagentidtemp1 = CStr(objResultDetailsSheet.Cells(i, 9))
+    Else
+        paidagentidtemp1 = CStr(objResultDetailsSheet.Cells(i, 2))
+    End If
+    paidagentidtemp2 = Left(paidagentidtemp1, 4) '1st Four Character(AGL- Or USL-) of AGENT ID
+    paidagentidtemp3 = Replace(paidagentidtemp1, paidagentidtemp2, "") 'Replace 1st Four Character(AGL- Or USL-) of AGENT ID with Blank
+    paidagentidtemp4 = InStr(paidagentidtemp3, "-") 'Pick the Level of the Agent ID after replacing
+    If paidagentidtemp4 <> 0 Then
+        paidagentidtemp5 = Right(paidagentidtemp3, 3)
+        paidagentidtemp6 = CStr(paidagentidtemp3)
+        objResultDetailsSheet.Cells(acrow, 26).NumberFormat = "@"
+        objResultDetailsSheet.Cells(acrow, 26) = CStr(Replace(paidagentidtemp6, paidagentidtemp5, "))
+    Else
+        objResultDetailsSheet.Cells(acrow, 26).NumberFormat = "@
+        objResultDetailsSheet.Cells(acrow, 26) = CStr(paidagentidtemp3)
+    End If
+    
+    If CStr(objResultDetailsSheet.Cells(i, 10)) = " Then
+        objResultDetailsSheet.Cells(acrow, 27).NumberFormat = "@
+        objResultDetailsSheet.Cells(acrow, 27) = CStr(objResultDetailsSheet.Cells(i, 8)) 'PAID TAX ID
+    Else
+        objResultDetailsSheet.Cells(acrow, 27).NumberFormat = "@"
+        objResultDetailsSheet.Cells(acrow, 27) = CStr(objResultDetailsSheet.Cells(i, 10)) 'PAID TAX ID
+    End If
+    
+    acrow = acrow + 1
+    'Earning AGENT ID Formatting in Second Row Based on Credit/Debit
+    
+    objResultDetailsSheet.Cells(acrow, 20) = CStr(objResultDetailsSheet.Cells(i, 1)) 'Policy No
+    objResultDetailsSheet.Cells(acrow, 21) = CStr(objResultDetailsSheet.Cells(i, 4)) 'Amount
+    objResultDetailsSheet.Cells(acrow, 22) = CStr(objResultDetailsSheet.Cells(i, 6)) 'Account No 2
+    objResultDetailsSheet.Cells(acrow, 25).NumberFormat = "@"
+    objResultDetailsSheet.Cells(acrow, 25) = CStr(objResultDetailsSheet.Cells(i, 8)) 'EARNING TAX ID
+    
+    'EARNING AGENT ID Formatting & Put Agent IN in SECOND ROW Based on Credit/Debit Amount
+    If earningagentidtemp4 <> 0 Then
+        earningagentidtemp5 = Right(earningagentidtemp3, 3)
+        earningagentidtemp6 = CStr(earningagentidtemp3)
+        objResultDetailsSheet.Cells(acrow, 24).NumberFormat = "@"
+        objResultDetailsSheet.Cells(acrow, 24) = CStr(Replace(earningagentidtemp6, earningagentidtemp5, "))
+        
+    Else
+        objResultDetailsSheet.Cells(acrow, 24).NumberFormat = "@
+        objResultDetailsSheet.Cells(acrow, 24) = CStr(earningagentidtemp3)
+    End If
+    
+    'Paid AGENT ID Formatting in Second Row Based on Credit/Debit
+    
+    If paidagentidtemp4 <> 0 Then
+        paidagentidtemp5 = Right(paidagentidtemp3, 3)
+        paidagentidtemp6 = CStr(paidagentidtemp3)
+        objResultDetailsSheet.Cells(acrow, 26).NumberFormat = "@"
+        objResultDetailsSheet.Cells(acrow, 26) = CStr(Replace(paidagentidtemp6, paidagentidtemp5, "))
+    Else
+        objResultDetailsSheet.Cells(acrow, 26).NumberFormat = "@
+        objResultDetailsSheet.Cells(acrow, 26) = CStr(paidagentidtemp3)
+    End If
+    
+    If CStr(objResultDetailsSheet.Cells(i, 10)) = " Then
+        objResultDetailsSheet.Cells(acrow, 27).NumberFormat = "@
+        objResultDetailsSheet.Cells(acrow, 27) = CStr(objResultDetailsSheet.Cells(i, 8)) 'PAID TAX ID
+    Else
+        objResultDetailsSheet.Cells(acrow, 27).NumberFormat = "@"
+        objResultDetailsSheet.Cells(acrow, 27) = CStr(objResultDetailsSheet.Cells(i, 10)) 'PAID TAX ID
+    End If
+    objResultDetailsSheet.Cells(acrow, 29).NumberFormat = "@"
+    objResultDetailsSheet.Cells(acrow, 29) = CStr(CompDate)
+    objResultDetailsSheet.Cells(acrow, 30).NumberFormat = "@" ' AGL USL COUNT
+    objResultDetailsSheet.Cells(acrow, 30) = CStr(earningagentidtemp7)
+    
+    acrow = acrow + 1
+    
+    'CREDIT & DEBIT IDENTIFICATION
+    If (objResultDetailsSheet.Cells(acrow - 2, 21).Value >= 0 And objResultDetailsSheet.Cells(acrow - 2, 22) = "147007") Then
+        objResultDetailsSheet.Cells(acrow - 2, 23) = "C"
+        objResultDetailsSheet.Cells(acrow - 1, 23) = "D"
+    Else
+        objResultDetailsSheet.Cells(acrow - 2, 23) = "D"
+        objResultDetailsSheet.Cells(acrow - 1, 23) = "C"
+    End If
+   If acrow = 195 Then
+   dddddd = 22
+   End If
+Next
+
+'Remove "-" Sign From the Amount
+endRow2 = objResultDetailsSheet.Cells(objResultDetailsSheet.Rows.Count, "U").End(xlUp).Row
+
+For i = 2 To endRow2
+
+    temp1amnt = objResultDetailsSheet.Cells(i, 21)
+    temp2amnt = InStr(temp1amnt, "-")
+    If temp2amnt <> 0 Then
+        temp3amnt = Replace(temp1amnt, "-", "")
+        objResultDetailsSheet.Cells(i, 28) = CDbl(temp3amnt)
+    Else
+        objResultDetailsSheet.Cells(i, 28) = CDbl(temp1amnt)
+    End If
+
+Next
+
+
+End Sub
+
+Sub DataPut_SAP_Vs_Credit()
+
+Dim endRow1 As Long
+Dim endRow2 As Long
+Dim acrow As Long
+Dim objResultDetailsSheet
+Dim objResultDetailsSheet1
+Dim counter As Long
+Dim counter1 As Long
+
+ThisWorkbook.Sheets("SAP DAILY DETAIL").Visible = True
+Set objResultDetailsSheet = ThisWorkbook.Sheets("SAP DAILY DETAIL")
+endRow1 = objResultDetailsSheet.Cells(objResultDetailsSheet.Rows.Count, "J").End(xlUp).Row
+
+Set objResultDetailsSheet1 = ThisWorkbook.Sheets("SAP_FEED Vs CREDIT RESULT")
+endRow2 = objResultDetailsSheet1.Cells(objResultDetailsSheet1.Rows.Count, "A").End(xlUp).Row
+
+For counter = 2 To endRow1
+
+    strPolicyNumber1 = Trim(objResultDetailsSheet.Cells(counter, 10))
+    intCommAmn1 = Trim(objResultDetailsSheet.Cells(counter, 4))
+    intAccountNumber1 = Trim(objResultDetailsSheet.Cells(counter, 5))
+    strCrDr1 = Trim(objResultDetailsSheet.Cells(counter, 3))
+    strAgentId1 = Trim(objResultDetailsSheet.Cells(counter, 39))
+    earningTaxId1 = Trim(objResultDetailsSheet.Cells(counter, 40))
+    strPaidAgentId1 = Trim(objResultDetailsSheet.Cells(counter, 64))
+    paidTaxId1 = Trim(objResultDetailsSheet.Cells(counter, 65))
+    CompDate = Trim(objResultDetailsSheet.Cells(counter, 12))
+    compcode = Trim(objResultDetailsSheet.Cells(counter, 71))
+    
+    objResultDetailsSheet1.Cells(counter, 1).NumberFormat = "@"
+    objResultDetailsSheet1.Cells(counter, 1) = compcode
+    objResultDetailsSheet1.Cells(counter, 2).NumberFormat = "@"
+    objResultDetailsSheet1.Cells(counter, 2) = strPolicyNumber1
+    objResultDetailsSheet1.Cells(counter, 3).NumberFormat = "@"
+    objResultDetailsSheet1.Cells(counter, 3) = intCommAmn1
+    objResultDetailsSheet1.Cells(counter, 4).NumberFormat = "@"
+    objResultDetailsSheet1.Cells(counter, 4) = intAccountNumber1
+    objResultDetailsSheet1.Cells(counter, 5).NumberFormat = "@"
+    objResultDetailsSheet1.Cells(counter, 5) = strCrDr1
+    objResultDetailsSheet1.Cells(counter, 6).NumberFormat = "@"
+    objResultDetailsSheet1.Cells(counter, 6) = strAgentId1
+    objResultDetailsSheet1.Cells(counter, 7).NumberFormat = "@"
+    objResultDetailsSheet1.Cells(counter, 7) = earningTaxId1
+    objResultDetailsSheet1.Cells(counter, 8).NumberFormat = "@"
+    objResultDetailsSheet1.Cells(counter, 8) = strPaidAgentId1
+    objResultDetailsSheet1.Cells(counter, 9).NumberFormat = "@"
+    objResultDetailsSheet1.Cells(counter, 9) = paidTaxId1
+    objResultDetailsSheet1.Cells(counter, 10).NumberFormat = "@"
+    objResultDetailsSheet1.Cells(counter, 10) = CompDate
+    
+Next
+objResultDetailsSheet1.Cells(1, 1).Value = "COMPANY CODE"
+objResultDetailsSheet1.Cells(1, 2).Value = "POLICY NUMBER"
+objResultDetailsSheet1.Cells(1, 3).Value = "COMMISSION AMOUNT"
+objResultDetailsSheet1.Cells(1, 4).Value = "ACCOUNT NUMBER"
+objResultDetailsSheet1.Cells(1, 5).Value = "CREDT/DEBIT"
+objResultDetailsSheet1.Cells(1, 6).Value = "EARNING AGENT ID"
+objResultDetailsSheet1.Cells(1, 7).Value = "EARNING TAX ID"
+objResultDetailsSheet1.Cells(1, 8).Value = "PAID AGENT ID"
+objResultDetailsSheet1.Cells(1, 9).Value = "PAID TAX ID"
+objResultDetailsSheet1.Cells(1, 10).Value = "COMPENSATION DATE"
+objResultDetailsSheet1.Cells(1, 15).Value = "KEY 1"
+objResultDetailsSheet1.Cells(1, 16).Value = "KEY 2"
+objResultDetailsSheet1.Cells(1, 11).Value = "STATUS"
+
+For r = 1 To 10
+    For w = 1 To endRow2
+        objResultDetailsSheet1.Cells(w, r).WrapText = False
+        objResultDetailsSheet1.Cells(w, r).CurrentRegion.EntireColumn.AutoFit
+        objResultDetailsSheet1.Cells(w, r).VerticalAlignment = xlCenter
+        objResultDetailsSheet1.Cells(w, r).HorizontalAlignment = xlCenter
+    Next
+Next
+
+For i = 1 To 16
+    objResultDetailsSheet1.Cells(1, i).WrapText = False
+    objResultDetailsSheet1.Cells(1, i).CurrentRegion.EntireColumn.AutoFit
+    objResultDetailsSheet1.Cells(1, i).VerticalAlignment = xlCenter
+    objResultDetailsSheet1.Cells(1, i).HorizontalAlignment = xlCenter
+    objResultDetailsSheet1.Cells(1, i).Interior.ColorIndex = 5
+    objResultDetailsSheet1.Cells(1, i).Font.Bold = True
+    objResultDetailsSheet1.Cells(1, i).Font.ColorIndex = 2
+Next
+
+ThisWorkbook.Sheets("SAP_FEED Vs CREDIT RESULT").Activate
+objResultDetailsSheet1.Range("A:J").Sort Key1:=objResultDetailsSheet1.Range("B1"), Order1:=xlAscending, Header:=xlYes
+
+End Sub
+Sub DataPut_Credit_Vs_SAP()
+
+Dim endRow1 As Long
+Dim endRow2 As Long
+Dim acrow As Long
+Dim objResultDetailsSheet
+Dim objResultDetailsSheet1
+Dim counter As Long
+Dim counter1 As Long
+
+ThisWorkbook.Sheets("SAP DAILY DETAIL").Visible = True
+Set objResultDetailsSheet = ThisWorkbook.Sheets("SAP_DAILY_TEMPORARY")
+endRow1 = objResultDetailsSheet.Cells(objResultDetailsSheet.Rows.Count, "T").End(xlUp).Row
+
+Set objResultDetailsSheet1 = ThisWorkbook.Sheets("CREDIT Vs SAP_FEED RESULT")
+endRow2 = objResultDetailsSheet1.Cells(objResultDetailsSheet1.Rows.Count, "A").End(xlUp).Row
+
+For counter = 2 To endRow1
+
+    strPolicyNumber1 = Trim(objResultDetailsSheet.Cells(counter, 20))
+    intCommAmn1 = Trim(objResultDetailsSheet.Cells(counter, 28))
+    intAccountNumber1 = Trim(objResultDetailsSheet.Cells(counter, 22))
+    strCrDr1 = Trim(objResultDetailsSheet.Cells(counter, 23))
+    strAgentId1 = Trim(objResultDetailsSheet.Cells(counter, 24))
+    earningTaxId1 = Trim(objResultDetailsSheet.Cells(counter, 25))
+    strPaidAgentId1 = Trim(objResultDetailsSheet.Cells(counter, 26))
+    paidTaxId1 = Trim(objResultDetailsSheet.Cells(counter, 27))
+    CompDate = Trim(objResultDetailsSheet.Cells(counter, 29))
+    compcode = Trim(objResultDetailsSheet.Cells(counter, 30))
+    
+    objResultDetailsSheet1.Cells(counter, 1).NumberFormat = "@"
+    objResultDetailsSheet1.Cells(counter, 1) = compcode
+    objResultDetailsSheet1.Cells(counter, 2).NumberFormat = "@"
+    objResultDetailsSheet1.Cells(counter, 2) = strPolicyNumber1
+    objResultDetailsSheet1.Cells(counter, 3).NumberFormat = "@"
+    objResultDetailsSheet1.Cells(counter, 3) = intCommAmn1
+    objResultDetailsSheet1.Cells(counter, 4).NumberFormat = "@"
+    objResultDetailsSheet1.Cells(counter, 4) = intAccountNumber1
+    objResultDetailsSheet1.Cells(counter, 5).NumberFormat = "@"
+    objResultDetailsSheet1.Cells(counter, 5) = strCrDr1
+    objResultDetailsSheet1.Cells(counter, 6).NumberFormat = "@"
+    objResultDetailsSheet1.Cells(counter, 6) = strAgentId1
+    objResultDetailsSheet1.Cells(counter, 7).NumberFormat = "@"
+    objResultDetailsSheet1.Cells(counter, 7) = earningTaxId1
+    objResultDetailsSheet1.Cells(counter, 8).NumberFormat = "@"
+    objResultDetailsSheet1.Cells(counter, 8) = strPaidAgentId1
+    objResultDetailsSheet1.Cells(counter, 9).NumberFormat = "@"
+    objResultDetailsSheet1.Cells(counter, 9) = paidTaxId1
+    objResultDetailsSheet1.Cells(counter, 10).NumberFormat = "@"
+    objResultDetailsSheet1.Cells(counter, 10) = CompDate
+    
+Next
+objResultDetailsSheet1.Cells(1, 1).Value = "COMPANY CODE"
+objResultDetailsSheet1.Cells(1, 2).Value = "POLICY NUMBER"
+objResultDetailsSheet1.Cells(1, 3).Value = "COMMISSION AMOUNT"
+objResultDetailsSheet1.Cells(1, 4).Value = "ACCOUNT NUMBER"
+objResultDetailsSheet1.Cells(1, 5).Value = "CREDT/DEBIT"
+objResultDetailsSheet1.Cells(1, 6).Value = "EARNING AGENT ID"
+objResultDetailsSheet1.Cells(1, 7).Value = "EARNING TAX ID"
+objResultDetailsSheet1.Cells(1, 8).Value = "PAID AGENT ID"
+objResultDetailsSheet1.Cells(1, 9).Value = "PAID TAX ID"
+objResultDetailsSheet1.Cells(1, 10).Value = "COMPENSATION DATE"
+objResultDetailsSheet1.Cells(1, 15).Value = "KEY 1"
+objResultDetailsSheet1.Cells(1, 16).Value = "KEY 2"
+objResultDetailsSheet1.Cells(1, 11).Value = "STATUS"
+
+For r = 1 To 10
+    For w = 1 To endRow2
+        objResultDetailsSheet1.Cells(w, r).WrapText = False
+        objResultDetailsSheet1.Cells(w, r).CurrentRegion.EntireColumn.AutoFit
+        objResultDetailsSheet1.Cells(w, r).VerticalAlignment = xlCenter
+        objResultDetailsSheet1.Cells(w, r).HorizontalAlignment = xlCenter
+    Next
+Next
+
+For i = 1 To 16
+    objResultDetailsSheet1.Cells(1, i).WrapText = False
+    objResultDetailsSheet1.Cells(1, i).CurrentRegion.EntireColumn.AutoFit
+    objResultDetailsSheet1.Cells(1, i).VerticalAlignment = xlCenter
+    objResultDetailsSheet1.Cells(1, i).HorizontalAlignment = xlCenter
+    objResultDetailsSheet1.Cells(1, i).Interior.ColorIndex = 5
+    objResultDetailsSheet1.Cells(1, i).Font.Bold = True
+    objResultDetailsSheet1.Cells(1, i).Font.ColorIndex = 2
+Next
+
+End Sub
+Sub Capture_ReprocessData()
+
+Dim endRow1 As Long
+Dim acrow As Long
+Dim objResultDetailsSheet
+Dim Dates As Variant
+
+ThisWorkbook.Sheets("SAP_DAILY_TEMPORARY2").Visible = True
+Set objResultDetailsSheet = ThisWorkbook.Sheets("SAP_DAILY_TEMPORARY2")
+endRow1 = objResultDetailsSheet.Cells(objResultDetailsSheet.Rows.Count, "R").End(xlUp).Row
+endRow2 = objResultDetailsSheet.Cells(objResultDetailsSheet.Rows.Count, "A").End(xlUp).Row
+Dates = CStr(ThisWorkbook.Sheets("Config").Range("E3"))
+
+For i = 2 To endRow1
+    addrow = endRow2 + i - 1
+    endRow2 = objResultDetailsSheet.Cells(objResultDetailsSheet.Rows.Count, "A").End(xlUp).Row
+    addrow2 = endRow2 + 1
+    ChangeInd = CStr(objResultDetailsSheet.Cells(i, 25))
+    CompDate = CStr(objResultDetailsSheet.Cells(i, 26))
+    flag = CStr(objResultDetailsSheet.Cells(i, 24))
+    'polno = objResultDetailsSheet.Cells(i, 18)
+    If (flag = "C" And ChangeInd <> "" And ((CompDate <> Dates) Or (CompDate = Dates))) Then
+        objResultDetailsSheet.Cells(addrow2, 1) = CStr(objResultDetailsSheet.Cells(i, 18)) 'Policy No
+        objResultDetailsSheet.Cells(addrow2, 2) = CStr(objResultDetailsSheet.Cells(i, 19)) 'Earning Agent
+        objResultDetailsSheet.Cells(addrow2, 3) = CStr(objResultDetailsSheet.Cells(i, 20)) 'Credit TYpe
+        objResultDetailsSheet.Cells(addrow2, 4) = CStr(objResultDetailsSheet.Cells(i, 21)) 'Commission
+        objResultDetailsSheet.Cells(addrow2, 5) = CStr(objResultDetailsSheet.Cells(i, 22)) 'Credit or Debit
+        objResultDetailsSheet.Cells(addrow2, 6) = CStr(objResultDetailsSheet.Cells(i, 23)) ' Account No
+        objResultDetailsSheet.Cells(addrow2, 7) = CStr(objResultDetailsSheet.Cells(i, 24)) 'Flag
+        objResultDetailsSheet.Cells(addrow2, 8) = CStr(objResultDetailsSheet.Cells(i, 25)) 'Credit Change Ind
+        objResultDetailsSheet.Cells(addrow2, 9) = CStr(objResultDetailsSheet.Cells(i, 26)) 'Compensation Date
+        objResultDetailsSheet.Cells(addrow2, 10) = CStr(objResultDetailsSheet.Cells(i, 27)) 'Earning Tax Id
+        objResultDetailsSheet.Cells(addrow2, 11) = CStr(objResultDetailsSheet.Cells(i, 28)) 'Paid Agent
+        objResultDetailsSheet.Cells(addrow2, 12) = CStr(objResultDetailsSheet.Cells(i, 29)) 'Paid Tax Id
+    End If
+Next
+
+End Sub
+Sub Convert_Reprocess_CreditDetails_to_SAPGL_Format()
+
+ThisWorkbook.Sheets("SAP_DAILY_TEMPORARY").Visible = True
+Set objResultDetailsSheet = ThisWorkbook.Sheets("SAP_DAILY_TEMPORARY")
+endRow1 = objResultDetailsSheet.Cells(objResultDetailsSheet.Rows.Count, "T").End(xlUp).Row
+
+ThisWorkbook.Sheets("SAP_DAILY_TEMPORARY2").Visible = True
+Set objResultDetailsSheet1 = ThisWorkbook.Sheets("SAP_DAILY_TEMPORARY2")
+endRow2 = objResultDetailsSheet1.Cells(objResultDetailsSheet1.Rows.Count, "A").End(xlUp).Row
+
+objResultDetailsSheet1.Cells(1, 13) = "EARNING AGENT ID"
+objResultDetailsSheet1.Cells(1, 13).WrapText = False
+objResultDetailsSheet1.Cells(1, 13).CurrentRegion.EntireColumn.AutoFit
+Range("K:K").VerticalAlignment = xlCenter
+Range("K:K").HorizontalAlignment = xlCenter
+
+objResultDetailsSheet1.Cells(1, 14) = "PAID AGENT ID"
+objResultDetailsSheet1.Cells(1, 14).WrapText = False
+objResultDetailsSheet1.Cells(1, 14).CurrentRegion.EntireColumn.AutoFit
+Range("L:L").VerticalAlignment = xlCenter
+Range("L:L").HorizontalAlignment = xlCenter
+
+objResultDetailsSheet1.Cells(1, 15) = "PAID TAX ID"
+objResultDetailsSheet1.Cells(1, 15).WrapText = False
+objResultDetailsSheet1.Cells(1, 15).CurrentRegion.EntireColumn.AutoFit
+Range("M:M").VerticalAlignment = xlCenter
+Range("M:M").HorizontalAlignment = xlCenter
+
+objResultDetailsSheet1.Cells(1, 16) = "ACOMM AMNT"
+objResultDetailsSheet1.Cells(1, 16).WrapText = False
+objResultDetailsSheet1.Cells(1, 16).CurrentRegion.EntireColumn.AutoFit
+Range("N:N").VerticalAlignment = xlCenter
+Range("N:N").HorizontalAlignment = xlCenter
+
+objResultDetailsSheet1.Cells(1, 17) = "AGL_USL_COUNT"
+objResultDetailsSheet1.Cells(1, 17).WrapText = False
+objResultDetailsSheet1.Cells(1, 17).CurrentRegion.EntireColumn.AutoFit
+Range("N:N").VerticalAlignment = xlCenter
+Range("N:N").HorizontalAlignment = xlCenter
+
+acrow = 2
+
+For i = 2 To endRow2
+
+    objResultDetailsSheet1.Cells(acrow, 13).NumberFormat = "@"
+    objResultDetailsSheet1.Cells(acrow, 14).NumberFormat = "@"
+    objResultDetailsSheet1.Cells(acrow, 15).NumberFormat = "@"
+    objResultDetailsSheet1.Cells(acrow, 16).NumberFormat = "@"
+    objResultDetailsSheet1.Cells(acrow, 17).NumberFormat = "@"
+    'EARNING Agent
+    earningagenttemp1 = CStr(objResultDetailsSheet1.Cells(i, 2))
+    earningagenttemp2 = Left(earningagenttemp1, 4)
+    earningagenttemp7 = Left(earningagenttemp1, 3)
+    earningagenttemp3 = Replace(earningagenttemp1, earningagenttemp2, "")
+    earningagenttemp4 = InStr(earningagenttemp3, "-")
+    
+    If earningagenttemp4 <> 0 Then
+        earningagenttemp5 = CStr(Right(earningagenttemp3, 3))
+        earningagenttemp6 = CStr(earningagenttemp3)
+        objResultDetailsSheet1.Cells(i, 13).NumberFormat = "@"
+        objResultDetailsSheet1.Cells(i, 13) = CStr(Replace(earningagenttemp6, earningagenttemp5, "))
+        objResultDetailsSheet1.Cells(1, 13).WrapText = False
+        objResultDetailsSheet1.Cells(1, 13).CurrentRegion.EntireColumn.AutoFit
+        objResultDetailsSheet1.Cells(1, 13).VerticalAlignment = xlCenter
+        objResultDetailsSheet1.Cells(1, 13).HorizontalAlignment = xlCenter
+    Else
+        earningagenttemp6 = earningagenttemp3
+        objResultDetailsSheet1.Cells(i, 13).NumberFormat = "@
+        objResultDetailsSheet1.Cells(i, 13) = CStr(earningagenttemp3)
+        objResultDetailsSheet1.Cells(1, 13).WrapText = False
+        objResultDetailsSheet1.Cells(1, 13).CurrentRegion.EntireColumn.AutoFit
+        objResultDetailsSheet1.Cells(1, 13).VerticalAlignment = xlCenter
+        objResultDetailsSheet1.Cells(1, 13).HorizontalAlignment = xlCenter
+    End If
+    
+    'PAID Agent
+    paidagenttemp = CStr(objResultDetailsSheet1.Cells(i, 11))
+    If CStr(paidagenttemp = "") Then
+        paidagenttemp1 = CStr(objResultDetailsSheet1.Cells(i, 2))
+    Else
+        paidagenttemp = CStr(objResultDetailsSheet1.Cells(i, 11))
+    End If
+    paidagenttemp2 = CStr(Left(paidagenttemp1, 4))
+    paidagenttemp3 = CStr(Replace(paidagenttemp1, paidagenttemp2, ""))
+    paidagenttemp4 = InStr(paidagenttemp3, "-")
+    
+    If paidagenttemp4 <> 0 Then
+        paidagenttemp5 = CStr(Right(paidagenttemp3, 3))
+        paidagenttemp6 = paidagenttemp3
+        objResultDetailsSheet1.Cells(i, 14).NumberFormat = "@"
+        objResultDetailsSheet1.Cells(i, 14) = CStr(Replace(paidagenttemp6, paidagenttemp5, "))
+        objResultDetailsSheet1.Cells(1, 14).WrapText = False
+        objResultDetailsSheet1.Cells(1, 14).CurrentRegion.EntireColumn.AutoFit
+        objResultDetailsSheet1.Cells(1, 14).VerticalAlignment = xlCenter
+        objResultDetailsSheet1.Cells(1, 14).HorizontalAlignment = xlCenter
+    Else
+        paidagenttemp6 = paidagenttemp3
+        objResultDetailsSheet1.Cells(i, 14).NumberFormat = "@
+        objResultDetailsSheet1.Cells(i, 14) = CStr(paidagenttemp3)
+        objResultDetailsSheet1.Cells(1, 14).WrapText = False
+        objResultDetailsSheet1.Cells(1, 14).CurrentRegion.EntireColumn.AutoFit
+        objResultDetailsSheet1.Cells(1, 14).VerticalAlignment = xlCenter
+        objResultDetailsSheet1.Cells(1, 14).HorizontalAlignment = xlCenter
+    End If
+    
+    temppaidtaxid = CStr(objResultDetailsSheet1.Cells(i, 12))
+    If CStr(temppaidtaxid = ") Then
+        objResultDetailsSheet1.Cells(i, 15).NumberFormat = "@
+        objResultDetailsSheet1.Cells(i, 15) = CStr(objResultDetailsSheet1.Cells(i, 10))
+    Else
+        objResultDetailsSheet1.Cells(i, 15).NumberFormat = "@"
+        objResultDetailsSheet1.Cells(i, 15) = CStr(objResultDetailsSheet1.Cells(i, 12))
+    End If
+    
+    objResultDetailsSheet1.Cells(i, 17).NumberFormat = "@"
+    objResultDetailsSheet1.Cells(i, 17) = CStr(earningagenttemp7) 'AGL Or USL Count
+    
+Next
+
+For i = 2 To endRow2
+    
+    tempamount = CDbl(objResultDetailsSheet1.Cells(i, 4))
+    tempaaccountno = CStr(objResultDetailsSheet1.Cells(i, 6))
+    tempflag = CStr(objResultDetailsSheet1.Cells(i, 7))
+    tempflag2 = CStr(objResultDetailsSheet1.Cells(i, 8))
+    
+    If CStr(tempflag) = "PR" And CDbl(tempamount) < 0 And CStr(tempaaccountno) = "147007" Then
+        objResultDetailsSheet1.Cells(i, 5) = "C"
+    ElseIf CStr(tempflag) = "PR" And CDbl(tempamount) < 0 And CStr(tempaaccountno) <> "147007" Then
+        objResultDetailsSheet1.Cells(i, 5) = "D"
+    ElseIf CStr(tempflag) = "PR" And CDbl(tempamount) >= 0 And CStr(tempaaccountno) = "147007" Then
+        objResultDetailsSheet1.Cells(i, 5) = "D"
+    ElseIf CStr(tempflag) = "PR" And CDbl(tempamount) >= 0 And CStr(tempaaccountno) <> "147007" Then
+        objResultDetailsSheet1.Cells(i, 5) = "C"
+    ElseIf CStr(tempflag) = "C" And CStr(tempflag2) = "T" And CDbl(tempamount) < 0 And CStr(tempaaccountno) = "147007" Then
+        objResultDetailsSheet1.Cells(i, 5) = "D"
+    ElseIf CStr(tempflag) = "C" And CStr(tempflag2) = "T" And CDbl(tempamount) < 0 And CStr(tempaaccountno) <> "147007" Then
+        objResultDetailsSheet1.Cells(i, 5) = "C"
+    ElseIf CStr(tempflag) = "C" And CStr(tempflag2) = "T" And CDbl(tempamount) >= 0 And CStr(tempaaccountno) = "147007" Then
+        objResultDetailsSheet1.Cells(i, 5) = "C"
+    ElseIf CStr(tempflag) = "C" And CStr(tempflag2) = "T" And CDbl(tempamount) >= 0 And CStr(tempaaccountno) <> "147007" Then
+        objResultDetailsSheet1.Cells(i, 5) = "D"
+    End If
+    
+Next
+
+accrow = endRow1
+    
+    For j = 2 To endRow2
+        
+        tempPolicyno = Trim(objResultDetailsSheet1.Cells(j, 1))
+        strPolicyno = Left(tempPolicyno, 10)
+        intCommAmnt = Trim(objResultDetailsSheet1.Cells(j, 4))
+        intAccNo = Trim(objResultDetailsSheet1.Cells(j, 6))
+        strDebitCredit = Trim(objResultDetailsSheet1.Cells(j, 5))
+        strearningAgent = Trim(objResultDetailsSheet1.Cells(j, 13))
+        intearningTaxid = Trim(objResultDetailsSheet1.Cells(j, 10))
+        strpaidAgent = Trim(objResultDetailsSheet1.Cells(j, 14))
+        intpaidTaxid = Trim(objResultDetailsSheet1.Cells(j, 15))
+        CompDate = Format(objResultDetailsSheet1.Cells(j, 9), "YYYYMMDD")
+        compcode = Trim(objResultDetailsSheet1.Cells(j, 17))
+        
+        objResultDetailsSheet.Cells(accrow + 1, 20).NumberFormat = "@"
+        objResultDetailsSheet.Cells(accrow + 1, 20) = CStr(strPolicyno)
+        objResultDetailsSheet.Cells(accrow + 1, 21).NumberFormat = "@"
+        objResultDetailsSheet.Cells(accrow + 1, 21) = CStr(intCommAmnt)
+        
+        temp1amnt = objResultDetailsSheet.Cells(accrow + 1, 21)
+        temp2amnt = InStr(temp1amnt, "-")
+        If temp2amnt <> 0 Then
+            temp3amnt = Replace(temp1amnt, "-", ")
+            objResultDetailsSheet.Cells(accrow + 1, 28).NumberFormat = "@
+            objResultDetailsSheet.Cells(accrow + 1, 28) = CDbl(temp3amnt)
+        Else
+            objResultDetailsSheet.Cells(accrow + 1, 28).NumberFormat = "@"
+            objResultDetailsSheet.Cells(accrow + 1, 28) = CDbl(temp1amnt)
+        End If
+        objResultDetailsSheet.Cells(accrow + 1, 22).NumberFormat = "@"
+        objResultDetailsSheet.Cells(accrow + 1, 22) = CStr(intAccNo)
+        objResultDetailsSheet.Cells(accrow + 1, 23).NumberFormat = "@"
+        objResultDetailsSheet.Cells(accrow + 1, 23) = CStr(strDebitCredit)
+        objResultDetailsSheet.Cells(accrow + 1, 24).NumberFormat = "@"
+        objResultDetailsSheet.Cells(accrow + 1, 24) = CStr(strearningAgent)
+        objResultDetailsSheet.Cells(accrow + 1, 25).NumberFormat = "@"
+        objResultDetailsSheet.Cells(accrow + 1, 25) = CStr(intearningTaxid)
+        objResultDetailsSheet.Cells(accrow + 1, 26).NumberFormat = "@"
+        objResultDetailsSheet.Cells(accrow + 1, 26) = CStr(strpaidAgent)
+        objResultDetailsSheet.Cells(accrow + 1, 27).NumberFormat = "@"
+        objResultDetailsSheet.Cells(accrow + 1, 27) = CStr(intpaidTaxid)
+        objResultDetailsSheet.Cells(accrow + 1, 29).NumberFormat = "@"
+        objResultDetailsSheet.Cells(accrow + 1, 29) = CStr(CompDate)
+        objResultDetailsSheet.Cells(accrow + 1, 30).NumberFormat = "@"
+        objResultDetailsSheet.Cells(accrow + 1, 30) = CStr(compcode)
+        accrow = accrow + 1
+        
+Next
+
+End Sub
+
+Sub SAP_Vs_Credit_Compare()
+
+Dim endRow1 As Long
+Dim endRow2 As Long
+Dim acrow As Long
+Dim objResultDetailsSheet
+Dim objResultDetailsSheet1
+Dim counter As Long
+Dim counter1 As Long
+
+Set objResultDetailsSheet = ThisWorkbook.Sheets("SAP_FEED Vs CREDIT RESULT")
+endRow1 = objResultDetailsSheet.Cells(objResultDetailsSheet.Rows.Count, "A").End(xlUp).Row
+Set objResultDetailsSheet1 = ThisWorkbook.Sheets("CREDIT Vs SAP_FEED RESULT")
+endRow2 = objResultDetailsSheet1.Cells(objResultDetailsSheet1.Rows.Count, "A").End(xlUp).Row
+Set objResultDetailsSheet2 = ThisWorkbook.Sheets("MISS MATCH RESULT")
+
+For counter = 2 To endRow1
+    compcode1 = CStr(objResultDetailsSheet.Cells(counter, 1))
+    strPolicyNumber1 = CStr(objResultDetailsSheet.Cells(counter, 2))
+    intCommAmnt1 = CStr(CDbl(objResultDetailsSheet.Cells(counter, 3) * 100))
+    intAccountNumber1 = CStr(objResultDetailsSheet.Cells(counter, 4))
+    strCrDr1 = CStr(objResultDetailsSheet.Cells(counter, 5))
+    strAgentId1 = CStr(objResultDetailsSheet.Cells(counter, 6))
+    earningTaxId1 = CStr(objResultDetailsSheet.Cells(counter, 7))
+    strPaidAgentId1 = CStr(objResultDetailsSheet.Cells(counter, 8))
+    paidTaxId1 = CStr(objResultDetailsSheet.Cells(counter, 9))
+    compdate1 = CStr(objResultDetailsSheet.Cells(counter, 10))
+    
+    strKey1 = compcode1 + strPolicyNumber1 + intCommAmnt1 + intAccountNumber1 + strCrDr1 + strAgentId1 + earningTaxId1 + strPaidAgentId1 + paidTaxId1 + compdate1
+    objResultDetailsSheet.Cells(counter, 15) = strKey1
+    objResultDetailsSheet1.Cells(counter, 15) = strKey1
+Next
+
+For counter1 = 2 To endRow2
+   compcode2 = CStr(objResultDetailsSheet1.Cells(counter1, 1))
+   strPolicyNumber2 = CStr(objResultDetailsSheet1.Cells(counter1, 2))
+   intCommAmnt2 = CStr(CDbl(objResultDetailsSheet1.Cells(counter1, 3) * 100))
+   intAccountNumber2 = CStr(objResultDetailsSheet1.Cells(counter1, 4))
+   strCrDr2 = CStr(objResultDetailsSheet1.Cells(counter1, 5))
+   strAgentId2 = CStr(objResultDetailsSheet1.Cells(counter1, 6))
+   earningTaxId2 = CStr(objResultDetailsSheet1.Cells(counter1, 7))
+   strPaidAgentId2 = CStr(objResultDetailsSheet1.Cells(counter1, 8))
+   paidTaxId2 = CStr(objResultDetailsSheet1.Cells(counter1, 9))
+   compdate2 = CStr(objResultDetailsSheet1.Cells(counter1, 10))
+   strKey2 = compcode2 + strPolicyNumber2 + intCommAmnt2 + intAccountNumber2 + strCrDr2 + strAgentId2 + earningTaxId2 + strPaidAgentId2 + paidTaxId2 + compdate2
+   objResultDetailsSheet.Cells(counter1, 16) = strKey2
+   objResultDetailsSheet1.Cells(counter1, 16) = strKey2
+Next
+
+'SAP VS CREDIT COMAPARISON
+For counter = 2 To endRow1
+    
+    If Application.WorksheetFunction.IsNA(Application.VLookup(objResultDetailsSheet.Cells(counter, 15), objResultDetailsSheet.Range("P:P"), 1, False)) Then
+        objResultDetailsSheet.Cells(counter, 11) = "Not Found"
+        objResultDetailsSheet.Cells(counter, 11).WrapText = False
+        objResultDetailsSheet.Cells(counter, 11).Interior.ColorIndex = 3
+        objResultDetailsSheet.Cells(counter, 11).CurrentRegion.EntireColumn.AutoFit
+        objResultDetailsSheet.Cells(counter, 11).VerticalAlignment = xlCenter
+        objResultDetailsSheet.Cells(counter, 11).HorizontalAlignment = xlCenter
+        
+        
+    Else
+        objResultDetailsSheet.Cells(counter, 11) = "Found"
+        objResultDetailsSheet.Cells(counter, 11).WrapText = False
+        objResultDetailsSheet.Cells(counter, 11).Interior.ColorIndex = 4
+        objResultDetailsSheet.Cells(counter, 11).CurrentRegion.EntireColumn.AutoFit
+        objResultDetailsSheet.Cells(counter, 11).VerticalAlignment = xlCenter
+        objResultDetailsSheet.Cells(counter, 11).HorizontalAlignment = xlCenter
+    End If
+    
+Next
+
+End Sub
+
+Sub Credit_Vs_SAP_Compare()
+
+Dim endRow1 As Long
+Dim endRow2 As Long
+Dim acrow As Long
+Dim objResultDetailsSheet
+Dim objResultDetailsSheet1
+Dim counter As Long
+Dim counter1 As Long
+
+Set objResultDetailsSheet = ThisWorkbook.Sheets("CREDIT Vs SAP_FEED RESULT")
+endRow1 = objResultDetailsSheet.Cells(objResultDetailsSheet.Rows.Count, "A").End(xlUp).Row
+Set objResultDetailsSheet1 = ThisWorkbook.Sheets("SAP_FEED Vs CREDIT RESULT")
+endRow2 = objResultDetailsSheet1.Cells(objResultDetailsSheet1.Rows.Count, "A").End(xlUp).Row
+Set objResultDetailsSheet2 = ThisWorkbook.Sheets("MISS MATCH RESULT")
+For counter = 2 To endRow1
+    compcode1 = CStr(objResultDetailsSheet.Cells(counter, 1))
+    strPolicyNumber1 = CStr(objResultDetailsSheet.Cells(counter, 2))
+    intCommAmnt1 = CStr(CDbl(objResultDetailsSheet.Cells(counter, 3) * 100))
+    intAccountNumber1 = CStr(objResultDetailsSheet.Cells(counter, 4))
+    strCrDr1 = CStr(objResultDetailsSheet.Cells(counter, 5))
+    strAgentId1 = CStr(objResultDetailsSheet.Cells(counter, 6))
+    earningTaxId1 = CStr(objResultDetailsSheet.Cells(counter, 7))
+    strPaidAgentId1 = CStr(objResultDetailsSheet.Cells(counter, 8))
+    paidTaxId1 = CStr(objResultDetailsSheet.Cells(counter, 9))
+    compdate1 = CStr(objResultDetailsSheet.Cells(counter, 10))
+    
+    strKey1 = compcode1 + strPolicyNumber1 + intCommAmnt1 + intAccountNumber1 + strCrDr1 + strAgentId1 + earningTaxId1 + strPaidAgentId1 + paidTaxId1 + compdate1
+    objResultDetailsSheet.Cells(counter, 15) = strKey1
+    
+Next
+
+For counter1 = 2 To endRow2
+'        If counter1 = 363 Then
+'            aa = aa
+'        End If
+        compcode2 = CStr(objResultDetailsSheet1.Cells(counter1, 1))
+        strPolicyNumber2 = CStr(objResultDetailsSheet1.Cells(counter1, 2))
+        intCommAmnt2 = CStr(CDbl(objResultDetailsSheet1.Cells(counter1, 3) * 100))
+        intAccountNumber2 = CStr(objResultDetailsSheet1.Cells(counter1, 4))
+        strCrDr2 = CStr(objResultDetailsSheet1.Cells(counter1, 5))
+        strAgentId2 = CStr(objResultDetailsSheet1.Cells(counter1, 6))
+        earningTaxId2 = CStr(objResultDetailsSheet1.Cells(counter1, 7))
+        strPaidAgentId2 = CStr(objResultDetailsSheet1.Cells(counter1, 8))
+        paidTaxId2 = CStr(objResultDetailsSheet1.Cells(counter1, 9))
+        compdate2 = CStr(objResultDetailsSheet1.Cells(counter1, 10))
+        
+        strKey2 = compcode2 + strPolicyNumber2 + intCommAmnt2 + intAccountNumber2 + strCrDr2 + strAgentId2 + earningTaxId2 + strPaidAgentId2 + paidTaxId2 + compdate2
+        objResultDetailsSheet.Cells(counter1, 16) = strKey2
+Next
+'Vlookup Syntax
+For counter = 2 To endRow1
+    
+    
+    If Application.WorksheetFunction.IsNA(Application.VLookup(objResultDetailsSheet.Cells(counter, 15), objResultDetailsSheet.Range("P:P"), 1, False)) Then
+        objResultDetailsSheet.Cells(counter, 11) = "Not Found"
+        objResultDetailsSheet.Cells(counter, 11).WrapText = False
+        objResultDetailsSheet.Cells(counter, 11).Interior.ColorIndex = 3
+        objResultDetailsSheet.Cells(counter, 11).CurrentRegion.EntireColumn.AutoFit
+        objResultDetailsSheet.Cells(counter, 11).VerticalAlignment = xlCenter
+        objResultDetailsSheet.Cells(counter, 11).HorizontalAlignment = xlCenter
+    Else
+        objResultDetailsSheet.Cells.Cells(counter, 11) = "Found"
+        objResultDetailsSheet.Cells(counter, 11).WrapText = False
+        objResultDetailsSheet.Cells(counter, 11).Interior.ColorIndex = 4
+        objResultDetailsSheet.Cells(counter, 11).CurrentRegion.EntireColumn.AutoFit
+        objResultDetailsSheet.Cells(counter, 11).VerticalAlignment = xlCenter
+        objResultDetailsSheet.Cells(counter, 11).HorizontalAlignment = xlCenter
+    End If
+    
+Next
+
+    
+End Sub
+
+Public Function Border1()
+
+ThisWorkbook.Sheets("CREDIT Vs SAP_FEED RESULT").Activate
+
+Range("A1").Select
+Range(Selection, Selection.End(xlDown)).Select
+Range(Selection, Selection.End(xlToRight)).Select
+Selection.Borders(xlDiagonalDown).LineStyle = xlNone
+Selection.Borders(xlDiagonalUp).LineStyle = xlNone
+With Selection.Borders(xlEdgeLeft)
+    .LineStyle = xlContinuous
+    .ColorIndex = 0
+    .TintAndShade = 0
+    .Weight = xlThin
+End With
+With Selection.Borders(xlEdgeTop)
+    .LineStyle = xlContinuous
+    .ColorIndex = 0
+    .TintAndShade = 0
+    .Weight = xlThin
+End With
+With Selection.Borders(xlEdgeBottom)
+    .LineStyle = xlContinuous
+    .ColorIndex = 0
+    .TintAndShade = 0
+    .Weight = xlThin
+End With
+With Selection.Borders(xlEdgeRight)
+    .LineStyle = xlContinuous
+    .ColorIndex = 0
+    .TintAndShade = 0
+    .Weight = xlThin
+End With
+With Selection.Borders(xlInsideVertical)
+    .LineStyle = xlContinuous
+    .ColorIndex = 0
+    .TintAndShade = 0
+    .Weight = xlThin
+End With
+With Selection.Borders(xlInsideHorizontal)
+    .LineStyle = xlContinuous
+    .ColorIndex = 0
+    .TintAndShade = 0
+    .Weight = xlThin
+End With
+ActiveWindow.DisplayGridlines = False
+
+ColumnColor = Cells.CurrentRegion.Columns.Count
+
+For a = 1 To ColumnColor
+
+    Cells(1, a).Interior.ColorIndex = 5
+    Cells(1, a).Font.Bold = True
+    Cells(1, a).Font.ColorIndex = 2
+'    Cells(1, a).HorizontalAlignment = xlCenter
+'    Cells(1, a).WrapText = True
+'    Cells(1, a).CurrentRegion.EntireColumn.AutoFit
+
+Next
+    Dim rng As Range: Set rng = Application.Range("O2")
+    rng.EntireColumn.Hidden = True
+    Dim rng1 As Range: Set rng1 = Application.Range("P2")
+    rng1.EntireColumn.Hidden = True
+    
+
+ThisWorkbook.Sheets("SAP DAILY DETAIL").Visible = False
+ThisWorkbook.Sheets("SAP_DAILY_TEMPORARY").Visible = False
+ThisWorkbook.Sheets("SAP_DAILY_TEMPORARY2").Visible = False
+ThisWorkbook.Sheets("DatabaseQuery").Visible = False
+
+End Function
+
+Public Function Border()
+
+ThisWorkbook.Sheets("SAP_FEED Vs CREDIT RESULT").Activate
+
+Range("A1").Select
+Range(Selection, Selection.End(xlDown)).Select
+Range(Selection, Selection.End(xlToRight)).Select
+Selection.Borders(xlDiagonalDown).LineStyle = xlNone
+Selection.Borders(xlDiagonalUp).LineStyle = xlNone
+With Selection.Borders(xlEdgeLeft)
+    .LineStyle = xlContinuous
+    .ColorIndex = 0
+    .TintAndShade = 0
+    .Weight = xlThin
+End With
+With Selection.Borders(xlEdgeTop)
+    .LineStyle = xlContinuous
+    .ColorIndex = 0
+    .TintAndShade = 0
+    .Weight = xlThin
+End With
+With Selection.Borders(xlEdgeBottom)
+    .LineStyle = xlContinuous
+    .ColorIndex = 0
+    .TintAndShade = 0
+    .Weight = xlThin
+End With
+With Selection.Borders(xlEdgeRight)
+    .LineStyle = xlContinuous
+    .ColorIndex = 0
+    .TintAndShade = 0
+    .Weight = xlThin
+End With
+With Selection.Borders(xlInsideVertical)
+    .LineStyle = xlContinuous
+    .ColorIndex = 0
+    .TintAndShade = 0
+    .Weight = xlThin
+End With
+With Selection.Borders(xlInsideHorizontal)
+    .LineStyle = xlContinuous
+    .ColorIndex = 0
+    .TintAndShade = 0
+    .Weight = xlThin
+End With
+ActiveWindow.DisplayGridlines = False
+
+ColumnColor = Cells.CurrentRegion.Columns.Count
+
+For a = 1 To ColumnColor
+
+    Cells(1, a).Interior.ColorIndex = 5
+    Cells(1, a).Font.Bold = True
+    Cells(1, a).Font.ColorIndex = 2
+'    Cells(1, a).HorizontalAlignment = xlCenter
+'    Cells(1, a).WrapText = True
+'    Cells(1, a).CurrentRegion.EntireColumn.AutoFit
+    
+Next
+    Dim rng As Range: Set rng = Application.Range("O2")
+    rng.EntireColumn.Hidden = True
+    Dim rng1 As Range: Set rng1 = Application.Range("P2")
+    rng1.EntireColumn.Hidden = True
+    
+End Function
+
+Sub Output_Report()
+
+Dim endRow1 As Long
+Dim endRow2 As Long
+Dim acrow As Long
+Dim objResultDetailsSheet
+Dim objResultDetailsSheet1
+Dim counter As Long
+Dim counter1 As Long
+Dim Filename As Variant
+Dim TextFile As Integer
+Dim sheetPath As Variant
+Dim SAP_VS_CREDIT As Range
+Dim CREDIT_VS_SAP As Range
+ThisWorkbook.Worksheets("SUMMARY").Activate
+TotalDebit = ThisWorkbook.Worksheets("SUMMARY").Cells(2, 1)
+TotalCredit = ThisWorkbook.Worksheets("SUMMARY").Cells(2, 2)
+TotalDebit1 = ThisWorkbook.Worksheets("SUMMARY").Cells(5, 1)
+TotalCredit1 = ThisWorkbook.Worksheets("SUMMARY").Cells(5, 2)
+Filename = "ANALYSIS REPORT"
+sheetPath = ActiveWorkbook.Path
+Documentpath = sheetPath & "/" & Filename & ".txt"
+TextFile = FreeFile
+
+ThisWorkbook.Sheets("SAP_FEED Vs CREDIT RESULT").Visible = True
+Set objResultDetailsSheet = ThisWorkbook.Sheets("SAP_FEED Vs CREDIT RESULT")
+endRow1 = objResultDetailsSheet.Cells(objResultDetailsSheet.Rows.Count, "A").End(xlUp).Row
+
+Set objResultDetailsSheet1 = ThisWorkbook.Sheets("CREDIT Vs SAP_FEED RESULT")
+endRow2 = objResultDetailsSheet1.Cells(objResultDetailsSheet1.Rows.Count, "A").End(xlUp).Row
+
+creditCVS = 0
+debitCVS = 0
+objResultDetailsSheet1.Activate
+For counter = 2 To endRow1
+
+    intCommAmn1 = Trim(objResultDetailsSheet.Cells(counter, 3))
+    intAccountNumber1 = Trim(objResultDetailsSheet.Cells(counter, 4))
+    strCrDr1 = Trim(objResultDetailsSheet.Cells(counter, 5))
+    
+    If (CStr(strCrDr1) = "C") Then
+        creditCVS = CDbl(Round(CDbl(creditCVS) + CDbl(intCommAmn1), 2))
+    Else
+        debitCVS = CDbl(Round(CDbl(debitCVS) + CDbl(intCommAmn1), 2))
+    End If
+
+Next
+
+debitSVC = 0
+creditSVC = 0
+objResultDetailsSheet.Activate
+For counter1 = 2 To endRow2
+
+    intCommAmn2 = Trim(objResultDetailsSheet1.Cells(counter1, 3))
+    intAccountNumber2 = Trim(objResultDetailsSheet1.Cells(counter1, 4))
+    strCrDr2 = Trim(objResultDetailsSheet1.Cells(counter1, 5))
+    
+    If (CStr(strCrDr2) = "C") Then
+        creditSVC = CDbl(Round(CDbl(creditSVC) + CDbl(intCommAmn2), 2))
+    Else
+        debitSVC = CDbl(Round(CDbl(debitSVC) + CDbl(intCommAmn2), 2))
+    End If
+
+Next
+
+ThisWorkbook.Sheets("SAP_DAILY_TEMPORARY").Visible = True
+Set objResultDetailsSheet2 = ThisWorkbook.Sheets("SAP_DAILY_TEMPORARY")
+endRow3 = objResultDetailsSheet2.Cells(objResultDetailsSheet2.Rows.Count, "AD").End(xlUp).Row
+AglCount = 0
+UslCount = 0
+totalCount = 0
+
+For totalCount = 2 To endRow3
+
+    datas = CStr(objResultDetailsSheet2.Cells(totalCount, 30))
+    
+    If (CStr(datas) = "AGL") Then
+        AglCount = CInt(AglCount) + 1
+    Else
+        UglCount = CInt(UglCount) + 1
+    End If
+
+Next
+  
+Open Documentpath For Output As TextFile
+    
+Print #TextFile, "*******SUMMARY OF SAP GL DAILY FEED*******"
+Print #TextFile, ""
+Print #TextFile, "TOTAL DEBIT & CREDIT AMOUNT FROM SAP DAILY DETAILS FEED: "
+Print #TextFile, ""
+Print #TextFile, "C: " & " $" & creditSVC
+Print #TextFile, "D: " & " $" & debitSVC
+Print #TextFile, ""
+
+Print #TextFile, "TOTAL DEBIT & CREDIT AMOUNT FROM CREDIT: "
+Print #TextFile, ""
+Print #TextFile, "C: " & " $" & creditCVS
+Print #TextFile, "D: " & " $" & debitCVS
+Print #TextFile, ""
+
+Print #TextFile, "TOTAL DEBIT & CREDIT AMOUNT IN SAP DETAIL DAILY CONTROL LINE: "
+Print #TextFile, ""
+Print #TextFile, "C: " & " $" & TotalCredit
+Print #TextFile, "D: " & " $" & TotalDebit
+Print #TextFile, ""
+
+Print #TextFile, "TOTAL DEBIT & CREDIT AMOUNT IN SAP BALANCE DAILY CONTROL LINE: "
+Print #TextFile, ""
+Print #TextFile, "C: " & " $" & TotalCredit1
+Print #TextFile, "D: " & " $" & TotalDebit1
+Print #TextFile, ""
+
+If (CStr(creditCVS) <> CStr(debitCVS)) Then
+    Print #TextFile, "Credit & Debit Amounts are Not matching In Credit"
+ElseIf (CStr(creditSVC) <> CStr(debitSVC)) Then
+    Print #TextFile, "Credit & Debit Amounts are Not matching In SAP Feed"
+ElseIf (CStr(TotalCredit) <> CStr(TotalDebit)) Then
+    Print #TextFile, "Credit & Debit Amounts are Not matching In DETAIL Control Line"
+ElseIf (CStr(creditCVS) <> CStr(creditSVC)) Then
+    Print #TextFile, " Total Credit Amounts are Not matching Between Credit and SAP File"
+ElseIf (CStr(creditCVS) <> CStr(TotalCredit)) Then
+    Print #TextFile, " Total Credit Amounts are Not matching Between Credit and DETAIL Control Line"
+ElseIf (CStr(creditSVC) <> CStr(TotalCredit)) Then
+    Print #TextFile, " Total Credit Amounts are Not matching Between SAP Feed and DETAIL Control Line"
+ElseIf (CStr(debitCVS) <> CStr(debitSVC)) Then
+    Print #TextFile, " Total Debit Amounts are Not matching Between Credit and SAP Feed"
+ElseIf (CStr(debitCVS) <> CStr(TotalDebit)) Then
+    Print #TextFile, " Total Debit Amounts are Not matching Between Credit and DETAIL Control Line"
+ElseIf (CStr(debitSVC) <> CStr(TotalDebit)) Then
+    Print #TextFile, " Total Debit Amounts are Not matching Between SAP Feed and DETAIL Control Line"
+ElseIf (CStr(TotalDebit1) <> CStr(TotalDebit)) Then
+    Print #TextFile, " Total Debit Amounts are Not matching Between SAP Feed and DETAIL Control Line"
+ElseIf (CStr(TotalCredit1) <> CStr(TotalCredit)) Then
+    Print #TextFile, " Total Debit Amounts are Not matching Between SAP Feed and DETAIL Control Line"
+Else
+    Print #TextFile, "Credit and Debit Amounts are Matching"
+End If
+
+Close TextFile
+End Sub
+
+Sub Debit_Credit_Groupping()
+Dim endRow1 As Long
+Dim objResultDetailsSheet
+Dim objResultDetailsSheet2
+
+ThisWorkbook.Sheets("SAP DAILY DETAIL").Activate
+
+Set objResultDetailsSheet = ThisWorkbook.Sheets("SAP DAILY DETAIL")
+endRow1 = objResultDetailsSheet.Cells(objResultDetailsSheet.Rows.Count, "BS").End(xlUp).Row
+Set objResultDetailsSheet1 = ThisWorkbook.Sheets("SAP DAILY BALANCE")
+endRow2 = objResultDetailsSheet1.Cells(objResultDetailsSheet1.Rows.Count, "A").End(xlUp).Row
+Set objResultDetailsSheet2 = ThisWorkbook.Sheets("SUMMARY")
+
+For i = 2 To endRow1
+
+    companyCode = CStr(objResultDetailsSheet.Cells(i, 71))
+    credit_Debit = CStr(objResultDetailsSheet.Cells(i, 3))
+    amount = CStr(objResultDetailsSheet.Cells(i, 4))
+    accountno = CStr(objResultDetailsSheet.Cells(i, 5))
+    
+    objResultDetailsSheet2.Cells(i, 4) = CStr(companyCode)
+    objResultDetailsSheet2.Cells(i, 5) = CStr(credit_Debit)
+    objResultDetailsSheet2.Cells(i, 6) = CStr(accountno)
+    objResultDetailsSheet2.Cells(i, 7) = CStr(amount)
+    
+Next
+
+objResultDetailsSheet2.Cells(1, 4) = "COMPANY CODE"
+objResultDetailsSheet2.Cells(1, 5) = "CREDIT/DEBIT"
+objResultDetailsSheet2.Cells(1, 6) = "ACCOUNT NO"
+objResultDetailsSheet2.Cells(1, 7) = "AMOUNT"
+
+For i = 4 To 7
+    objResultDetailsSheet2.Cells(1, i).WrapText = False
+    objResultDetailsSheet2.Cells(1, i).CurrentRegion.EntireColumn.AutoFit
+    objResultDetailsSheet2.Cells(1, i).VerticalAlignment = xlCenter
+    objResultDetailsSheet2.Cells(1, i).HorizontalAlignment = xlCenter
+    objResultDetailsSheet2.Cells(1, i).Interior.ColorIndex = 5
+    objResultDetailsSheet2.Cells(1, i).Font.Bold = True
+    objResultDetailsSheet2.Cells(1, i).Font.ColorIndex = 2
+Next
+objResultDetailsSheet2.Range("D:D").CurrentRegion.EntireColumn.AutoFit
+objResultDetailsSheet2.Range("D:D").VerticalAlignment = xlCenter
+objResultDetailsSheet2.Range("D:D").HorizontalAlignment = xlCenter
+objResultDetailsSheet2.Range("E:E").CurrentRegion.EntireColumn.AutoFit
+objResultDetailsSheet2.Range("E:E").VerticalAlignment = xlCenter
+objResultDetailsSheet2.Range("E:E").HorizontalAlignment = xlCenter
+objResultDetailsSheet2.Range("F:F").CurrentRegion.EntireColumn.AutoFit
+objResultDetailsSheet2.Range("F:F").VerticalAlignment = xlCenter
+objResultDetailsSheet2.Range("F:F").HorizontalAlignment = xlCenter
+objResultDetailsSheet2.Range("G:G").CurrentRegion.EntireColumn.AutoFit
+objResultDetailsSheet2.Range("G:G").VerticalAlignment = xlCenter
+objResultDetailsSheet2.Range("G:G").HorizontalAlignment = xlCenter
+
+
+For i = 2 To endRow2
+
+    companyCode = CStr(objResultDetailsSheet1.Cells(i, 5))
+    credit_Debit = CStr(objResultDetailsSheet1.Cells(i, 8))
+    amount = CStr(objResultDetailsSheet1.Cells(i, 7))
+    accountno = CStr(objResultDetailsSheet1.Cells(i, 6))
+    
+    objResultDetailsSheet2.Cells(i, 9) = CStr(companyCode)
+    objResultDetailsSheet2.Cells(i, 10) = CStr(credit_Debit)
+    objResultDetailsSheet2.Cells(i, 11) = CStr(accountno)
+    objResultDetailsSheet2.Cells(i, 12) = CStr(amount)
+    
+Next
+
+objResultDetailsSheet2.Cells(1, 9) = "COMPANY CODE"
+objResultDetailsSheet2.Cells(1, 10) = "CREDIT/DEBIT"
+objResultDetailsSheet2.Cells(1, 11) = "ACCOUNT NO"
+objResultDetailsSheet2.Cells(1, 12) = "AMOUNT"
+
+For i = 9 To 12
+    objResultDetailsSheet2.Cells(1, i).WrapText = False
+    objResultDetailsSheet2.Cells(1, i).CurrentRegion.EntireColumn.AutoFit
+    objResultDetailsSheet2.Cells(1, i).VerticalAlignment = xlCenter
+    objResultDetailsSheet2.Cells(1, i).HorizontalAlignment = xlCenter
+    objResultDetailsSheet2.Cells(1, i).Interior.ColorIndex = 5
+    objResultDetailsSheet2.Cells(1, i).Font.Bold = True
+    objResultDetailsSheet2.Cells(1, i).Font.ColorIndex = 2
+Next
+objResultDetailsSheet2.Range("I:I").CurrentRegion.EntireColumn.AutoFit
+objResultDetailsSheet2.Range("I:I").VerticalAlignment = xlCenter
+objResultDetailsSheet2.Range("I:I").HorizontalAlignment = xlCenter
+objResultDetailsSheet2.Range("J:J").CurrentRegion.EntireColumn.AutoFit
+objResultDetailsSheet2.Range("J:J").VerticalAlignment = xlCenter
+objResultDetailsSheet2.Range("J:J").HorizontalAlignment = xlCenter
+objResultDetailsSheet2.Range("K:K").CurrentRegion.EntireColumn.AutoFit
+objResultDetailsSheet2.Range("K:K").VerticalAlignment = xlCenter
+objResultDetailsSheet2.Range("K:K").HorizontalAlignment = xlCenter
+objResultDetailsSheet2.Range("L:L").CurrentRegion.EntireColumn.AutoFit
+objResultDetailsSheet2.Range("L:L").VerticalAlignment = xlCenter
+objResultDetailsSheet2.Range("L:L").HorizontalAlignment = xlCenter
+
+ThisWorkbook.Sheets("BALANCE SUMMARY").PivotTables("PivotTable1").PivotCache.Refresh
+ThisWorkbook.Sheets("BALANCE SUMMARY").PivotTables("PivotTable2").PivotCache.Refresh
+ThisWorkbook.Sheets("BALANCE SUMMARY").Activate
+
+End Sub
+Sub Missmatch_SAP_CREDIT()
+Dim endRow1 As Long
+Dim endRow2 As Long
+Dim acrow As Long
+Dim objResultDetailsSheet
+Dim objResultDetailsSheet1
+Dim counter As Long
+Dim counter1 As Long
+
+Set objResultDetailsSheet = ThisWorkbook.Sheets("SAP_FEED Vs CREDIT RESULT")
+endRow1 = objResultDetailsSheet.Cells(objResultDetailsSheet.Rows.Count, "A").End(xlUp).Row
+Set objResultDetailsSheet2 = ThisWorkbook.Sheets("MISS MATCH RESULT")
+
+j = 2
+flag = 0
+objResultDetailsSheet2.Cells(1, 1) = "MISS MATCH COMPARISON RESULT BETWEEN SAP FEED Vs CREDIT: "
+objResultDetailsSheet2.Cells(1, 1).Font.Size = 20
+objResultDetailsSheet2.Cells(1, 1).Font.Bold = True
+objResultDetailsSheet2.Cells(1, 1).Font.Color = RGB(128, 26, 0)
+
+For counter = 2 To endRow1
+    compcode1 = CStr(objResultDetailsSheet.Cells(counter, 1))
+    strPolicyNumber1 = CStr(objResultDetailsSheet.Cells(counter, 2))
+    tempPolicyNumber1 = CStr(objResultDetailsSheet.Cells(counter - 1, 2))
+    intCommAmnt1 = CStr(CDbl(objResultDetailsSheet.Cells(counter, 3) * 100))
+    intAccountNumber1 = CStr(objResultDetailsSheet.Cells(counter, 4))
+    strCrDr1 = CStr(objResultDetailsSheet.Cells(counter, 5))
+    strAgentId1 = CStr(objResultDetailsSheet.Cells(counter, 6))
+    earningTaxId1 = CStr(objResultDetailsSheet.Cells(counter, 7))
+    strPaidAgentId1 = CStr(objResultDetailsSheet.Cells(counter, 8))
+    paidTaxId1 = CStr(objResultDetailsSheet.Cells(counter, 9))
+    compdate1 = CStr(objResultDetailsSheet.Cells(counter, 10))
+    Status = CStr(objResultDetailsSheet.Cells(counter, 11))
+    tempStatus = CStr(objResultDetailsSheet.Cells(counter - 1, 11))
+    If CStr(Status) = "Not Found" Then
+        If CStr(tempPolicyNumber1) = CStr(strPolicyNumber1) And flag = 1 Then
+            flag = 1
+'            If CStr(tempPolicyNumber1) = CStr(strPolicyNumber1) Then
+'                flag = 1
+'            End If
+        Else
+            flag = 0
+            If CStr(tempPolicyNumber1) = CStr(strPolicyNumber1) And CStr(tempStatus) = CStr(Status) Then
+                flag = 1
+            End If
+        End If
+        If flag = 0 Then
+            j = objResultDetailsSheet2.Cells(objResultDetailsSheet2.Rows.Count, "A").End(xlUp).Row
+            j = j + 1
+            objResultDetailsSheet2.Cells(j + 1, 1) = "MISS MATCH POLICY NO: " & strPolicyNumber1
+            objResultDetailsSheet2.Cells(j + 1, 1).Font.Size = 14
+            objResultDetailsSheet2.Cells(j + 1, 1).Font.Bold = True
+            objResultDetailsSheet2.Cells(j + 1, 1).Font.Color = RGB(0, 0, 255)
+
+            objResultDetailsSheet2.Cells(j + 2, 1) = "COMPANY CODE"
+            objResultDetailsSheet2.Cells(j + 2, 1).Font.Bold = True
+            objResultDetailsSheet2.Cells(j + 2, 2) = "POLICY NUMBER"
+            objResultDetailsSheet2.Cells(j + 2, 2).Font.Bold = True
+            objResultDetailsSheet2.Cells(j + 2, 3) = "COMMISSION AMOUNT"
+            objResultDetailsSheet2.Cells(j + 2, 3).Font.Bold = True
+            objResultDetailsSheet2.Cells(j + 2, 4) = "ACCOUNT NUMBER"
+            objResultDetailsSheet2.Cells(j + 2, 4).Font.Bold = True
+            objResultDetailsSheet2.Cells(j + 2, 5) = "CREDIT/ DEBIT"
+            objResultDetailsSheet2.Cells(j + 2, 5).Font.Bold = True
+            objResultDetailsSheet2.Cells(j + 2, 6) = "EARNING AGENT"
+            objResultDetailsSheet2.Cells(j + 2, 6).Font.Bold = True
+            objResultDetailsSheet2.Cells(j + 2, 7) = "EARNING TAX ID"
+            objResultDetailsSheet2.Cells(j + 2, 7).Font.Bold = True
+            objResultDetailsSheet2.Cells(j + 2, 8) = "PAID AGENT ID"
+            objResultDetailsSheet2.Cells(j + 2, 8).Font.Bold = True
+            objResultDetailsSheet2.Cells(j + 2, 9) = "PAID TAX ID"
+            objResultDetailsSheet2.Cells(j + 2, 9).Font.Bold = True
+            objResultDetailsSheet2.Cells(j + 2, 10) = "COMPENSATION DATE"
+            objResultDetailsSheet2.Cells(j + 2, 10).Font.Bold = True
+            
+            objResultDetailsSheet2.Cells(j + 3, 1) = CStr(compcode1)
+            objResultDetailsSheet2.Cells(j + 3, 2) = CStr(strPolicyNumber1)
+            objResultDetailsSheet2.Cells(j + 3, 3) = CStr(intCommAmnt1)
+            objResultDetailsSheet2.Cells(j + 3, 4) = CStr(intAccountNumber1)
+            objResultDetailsSheet2.Cells(j + 3, 5) = CStr(strCrDr1)
+            objResultDetailsSheet2.Cells(j + 3, 6) = CStr(strAgentId1)
+            objResultDetailsSheet2.Cells(j + 3, 7) = CStr(earningTaxId1)
+            objResultDetailsSheet2.Cells(j + 3, 8) = CStr(strPaidAgentId1)
+            objResultDetailsSheet2.Cells(j + 3, 9) = CStr(paidTaxId1)
+            objResultDetailsSheet2.Cells(j + 3, 10) = CStr(compdate1)
+            
+            j = j + 1
+            flag = 1
+        Else
+            objResultDetailsSheet2.Cells(j + 3, 1) = CStr(compcode1)
+            objResultDetailsSheet2.Cells(j + 3, 2) = CStr(strPolicyNumber1)
+            objResultDetailsSheet2.Cells(j + 3, 3) = CStr(intCommAmnt1)
+            objResultDetailsSheet2.Cells(j + 3, 4) = CStr(intAccountNumber1)
+            objResultDetailsSheet2.Cells(j + 3, 5) = CStr(strCrDr1)
+            objResultDetailsSheet2.Cells(j + 3, 6) = CStr(strAgentId1)
+            objResultDetailsSheet2.Cells(j + 3, 7) = CStr(earningTaxId1)
+            objResultDetailsSheet2.Cells(j + 3, 8) = CStr(strPaidAgentId1)
+            objResultDetailsSheet2.Cells(j + 3, 9) = CStr(paidTaxId1)
+            objResultDetailsSheet2.Cells(j + 3, 10) = CStr(compdate1)
+            
+            j = j + 1
+            flag = 0
+        End If
+    End If
+Next
+End Sub
+
+Sub Missmatch_CREDIT_SAP()
+Dim endRow1 As Long
+Dim endRow2 As Long
+Dim acrow As Long
+Dim objResultDetailsSheet
+Dim objResultDetailsSheet1
+Dim counter As Long
+Dim counter1 As Long
+
+Set objResultDetailsSheet1 = ThisWorkbook.Sheets("CREDIT Vs SAP_FEED RESULT")
+endRow2 = objResultDetailsSheet1.Cells(objResultDetailsSheet1.Rows.Count, "A").End(xlUp).Row
+Set objResultDetailsSheet2 = ThisWorkbook.Sheets("MISS MATCH RESULT")
+
+j = objResultDetailsSheet2.Cells(objResultDetailsSheet2.Rows.Count, "A").End(xlUp).Row
+j = j + 2
+flag = 0
+objResultDetailsSheet2.Cells(j, 1) = "MISS MATCH COMPARISON RESULT BETWEEN CREDIT Vs SAP FEED: "
+objResultDetailsSheet2.Cells(j, 1).Font.Size = 20
+objResultDetailsSheet2.Cells(j, 1).Font.Bold = True
+objResultDetailsSheet2.Cells(j, 1).Font.Color = RGB(128, 26, 0)
+
+For counter = 2 To endRow2
+    compcode1 = CStr(objResultDetailsSheet1.Cells(counter, 1))
+    strPolicyNumber1 = CStr(objResultDetailsSheet1.Cells(counter, 2))
+    tempPolicyNumber1 = CStr(objResultDetailsSheet1.Cells(counter - 1, 2))
+    intCommAmnt1 = CStr(CDbl(objResultDetailsSheet1.Cells(counter, 3) * 100))
+    intAccountNumber1 = CStr(objResultDetailsSheet1.Cells(counter, 4))
+    strCrDr1 = CStr(objResultDetailsSheet1.Cells(counter, 5))
+    strAgentId1 = CStr(objResultDetailsSheet1.Cells(counter, 6))
+    earningTaxId1 = CStr(objResultDetailsSheet1.Cells(counter, 7))
+    strPaidAgentId1 = CStr(objResultDetailsSheet1.Cells(counter, 8))
+    paidTaxId1 = CStr(objResultDetailsSheet1.Cells(counter, 9))
+    compdate1 = CStr(objResultDetailsSheet1.Cells(counter, 10))
+    Status = CStr(objResultDetailsSheet1.Cells(counter, 11))
+    tempStatus = CStr(objResultDetailsSheet1.Cells(counter - 1, 11))
+    If CStr(Status) = "Not Found" Then
+        If CStr(tempPolicyNumber1) = CStr(strPolicyNumber1) And flag = 1 Then
+            flag = 1
+        Else
+            flag = 0
+            If CStr(tempPolicyNumber1) = CStr(strPolicyNumber1) And CStr(tempStatus) = CStr(Status) Then
+                flag = 1
+            End If
+        End If
+        If flag = 0 Then
+            j = objResultDetailsSheet2.Cells(objResultDetailsSheet2.Rows.Count, "A").End(xlUp).Row
+            j = j + 1
+            objResultDetailsSheet2.Cells(j + 1, 1) = "MISS MATCH POLICY NO: " & strPolicyNumber1
+            objResultDetailsSheet2.Cells(j + 1, 1).Font.Size = 14
+            objResultDetailsSheet2.Cells(j + 1, 1).Font.Bold = True
+            objResultDetailsSheet2.Cells(j + 1, 1).Font.Color = RGB(0, 0, 255)
+
+            objResultDetailsSheet2.Cells(j + 2, 1) = "COMPANY CODE"
+            objResultDetailsSheet2.Cells(j + 2, 1).Font.Bold = True
+            objResultDetailsSheet2.Cells(j + 2, 2) = "POLICY NUMBER"
+            objResultDetailsSheet2.Cells(j + 2, 2).Font.Bold = True
+            objResultDetailsSheet2.Cells(j + 2, 3) = "COMMISSION AMOUNT"
+            objResultDetailsSheet2.Cells(j + 2, 3).Font.Bold = True
+            objResultDetailsSheet2.Cells(j + 2, 4) = "ACCOUNT NUMBER"
+            objResultDetailsSheet2.Cells(j + 2, 4).Font.Bold = True
+            objResultDetailsSheet2.Cells(j + 2, 5) = "CREDIT/ DEBIT"
+            objResultDetailsSheet2.Cells(j + 2, 5).Font.Bold = True
+            objResultDetailsSheet2.Cells(j + 2, 6) = "EARNING AGENT"
+            objResultDetailsSheet2.Cells(j + 2, 6).Font.Bold = True
+            objResultDetailsSheet2.Cells(j + 2, 7) = "EARNING TAX ID"
+            objResultDetailsSheet2.Cells(j + 2, 7).Font.Bold = True
+            objResultDetailsSheet2.Cells(j + 2, 8) = "PAID AGENT ID"
+            objResultDetailsSheet2.Cells(j + 2, 8).Font.Bold = True
+            objResultDetailsSheet2.Cells(j + 2, 9) = "PAID TAX ID"
+            objResultDetailsSheet2.Cells(j + 2, 9).Font.Bold = True
+            objResultDetailsSheet2.Cells(j + 2, 10) = "COMPENSATION DATE"
+            objResultDetailsSheet2.Cells(j + 2, 10).Font.Bold = True
+            
+            objResultDetailsSheet2.Cells(j + 3, 1) = CStr(compcode1)
+            objResultDetailsSheet2.Cells(j + 3, 2) = CStr(strPolicyNumber1)
+            objResultDetailsSheet2.Cells(j + 3, 3) = CStr(intCommAmnt1)
+            objResultDetailsSheet2.Cells(j + 3, 4) = CStr(intAccountNumber1)
+            objResultDetailsSheet2.Cells(j + 3, 5) = CStr(strCrDr1)
+            objResultDetailsSheet2.Cells(j + 3, 6) = CStr(strAgentId1)
+            objResultDetailsSheet2.Cells(j + 3, 7) = CStr(earningTaxId1)
+            objResultDetailsSheet2.Cells(j + 3, 8) = CStr(strPaidAgentId1)
+            objResultDetailsSheet2.Cells(j + 3, 9) = CStr(paidTaxId1)
+            objResultDetailsSheet2.Cells(j + 3, 10) = CStr(compdate1)
+            
+            j = j + 1
+            flag = 1
+        Else
+            objResultDetailsSheet2.Cells(j + 3, 1) = CStr(compcode1)
+            objResultDetailsSheet2.Cells(j + 3, 2) = CStr(strPolicyNumber1)
+            objResultDetailsSheet2.Cells(j + 3, 3) = CStr(intCommAmnt1)
+            objResultDetailsSheet2.Cells(j + 3, 4) = CStr(intAccountNumber1)
+            objResultDetailsSheet2.Cells(j + 3, 5) = CStr(strCrDr1)
+            objResultDetailsSheet2.Cells(j + 3, 6) = CStr(strAgentId1)
+            objResultDetailsSheet2.Cells(j + 3, 7) = CStr(earningTaxId1)
+            objResultDetailsSheet2.Cells(j + 3, 8) = CStr(strPaidAgentId1)
+            objResultDetailsSheet2.Cells(j + 3, 9) = CStr(paidTaxId1)
+            objResultDetailsSheet2.Cells(j + 3, 10) = CStr(compdate1)
+            
+            j = j + 1
+            flag = 0
+        End If
+    End If
+Next
+End Sub
+
+Thanks & Regards
+
+Arijit Bhattacharjee
+Cognizant
+AIG ELC Application QA Offshore
+Cognizant GTP Campus - Bantala, 
+Karaidanga, Gangapur,
+West Bengal – 743502, India
+Office Extension: 972-368-9300 x 317134
+Cell: +91 9830828869
+arijit.bhattacharjee@aig.com
+
+
+
+From: Bhattacharjee, Arijit 
+Sent: Friday, September 03, 2021 2:33 PM
+To: Bhattacharjee, Arijit <Arijit.Bhattacharjee@aig.com>
+Subject: VB Script Part 1
+
+Module 1:
+
+'Option Explicit
+‘********Hide Bar Where Default Cross Sign Is Present of a User Form*********
+#If VBA7 Then
+    Public Declare PtrSafe Function FindWindow Lib "user32" _
+                Alias "FindWindowA" _
+               (ByVal lpClassName As String, _
+                ByVal lpWindowName As String) As Long
+    Public Declare PtrSafe Function GetWindowLong Lib "user32" _
+                Alias "GetWindowLongA" _
+               (ByVal hWnd As Long, _
+                ByVal nIndex As Long) As Long
+    Public Declare PtrSafe Function SetWindowLong Lib "user32" _
+                Alias "SetWindowLongA" _
+               (ByVal hWnd As Long, _
+                ByVal nIndex As Long, _
+                ByVal dwNewLong As Long) As Long
+    Public Declare PtrSafe Function DrawMenuBar Lib "user32" _
+               (ByVal hWnd As Long) As Long
+#Else
+    Public Declare Function FindWindow Lib "user32" _
+                Alias "FindWindowA" _
+               (ByVal lpClassName As String, _
+                ByVal lpWindowName As String) As Long
+    Public Declare Function GetWindowLong Lib "user32" _
+                Alias "GetWindowLongA" _
+               (ByVal hWnd As Long, _
+                ByVal nIndex As Long) As Long
+    Public Declare Function SetWindowLong Lib "user32" _
+                Alias "SetWindowLongA" _
+               (ByVal hWnd As Long, _
+                ByVal nIndex As Long, _
+                ByVal dwNewLong As Long) As Long
+    Public Declare Function DrawMenuBar Lib "user32" _
+               (ByVal hWnd As Long) As Long
+#End If
+
+Sub HideBar(frm As Object)
+
+Dim Style As Long, Menu As Long, hWndForm As Long
+hWndForm = FindWindow("ThunderDFrame", frm.Caption)
+Style = GetWindowLong(hWndForm, &HFFF0)
+Style = Style And Not &HC00000
+SetWindowLong hWndForm, &HFFF0, Style
+DrawMenuBar hWndForm
+
+End Sub
+
+‘********Clear Data**********************
+Sub Clear_Data()
+    ThisWorkbook.Worksheets("SAP DAILY DETAIL").Activate
+    ThisWorkbook.Worksheets("SAP DAILY DETAIL").Cells.Select
+    Selection.ClearContents
+    Selection.ClearFormats
+    ThisWorkbook.Worksheets("Config").Activate
+    Range("C3").Value = ""
+    Range("C4").Value = ""
+    Range("D3").Value = ""
+    Range("E3").Value = ""
+    Range("F3").Value = ""
+    
+    ThisWorkbook.Worksheets("SAP_FEED Vs CREDIT RESULT").Activate
+    ThisWorkbook.Worksheets("SAP_FEED Vs CREDIT RESULT").Cells.Select
+    Selection.ClearContents
+    Selection.ClearFormats
+    ThisWorkbook.Worksheets("SAP_FEED Vs CREDIT RESULT").Cells.Clear
+    
+    ThisWorkbook.Worksheets("CREDIT Vs SAP_FEED RESULT").Activate
+    ThisWorkbook.Worksheets("CREDIT Vs SAP_FEED RESULT").Cells.Select
+    Selection.ClearContents
+    Selection.ClearFormats
+    ThisWorkbook.Worksheets("CREDIT Vs SAP_FEED RESULT").Cells.Clear
+    
+    ThisWorkbook.Worksheets("SAP_DAILY_TEMPORARY").Activate
+    ThisWorkbook.Worksheets("SAP_DAILY_TEMPORARY").Cells.Select
+    Selection.ClearContents
+    Selection.ClearFormats
+    ThisWorkbook.Worksheets("SAP_DAILY_TEMPORARY").Cells.Clear
+    
+    ThisWorkbook.Worksheets("SAP_DAILY_TEMPORARY2").Activate
+    ThisWorkbook.Worksheets("SAP_DAILY_TEMPORARY2").Cells.Select
+    Selection.ClearContents
+    Selection.ClearFormats
+    ThisWorkbook.Worksheets("SAP_DAILY_TEMPORARY2").Cells.Clear
+    
+    ThisWorkbook.Worksheets("MISS MATCH RESULT").Activate
+    ThisWorkbook.Worksheets("MISS MATCH RESULT").Cells.Select
+    Selection.ClearContents
+    Selection.ClearFormats
+    ThisWorkbook.Worksheets("MISS MATCH RESULT").Cells.Clear
+    
+    ThisWorkbook.Worksheets("SUMMARY").Activate
+    ThisWorkbook.Worksheets("SUMMARY").Cells.Select
+    Selection.ClearContents
+    Selection.ClearFormats
+    ThisWorkbook.Worksheets("SUMMARY").Cells.Clear
+    
+    ThisWorkbook.Worksheets("SAP DAILY BALANCE").Activate
+    ThisWorkbook.Worksheets("SAP DAILY BALANCE").Cells.Select
+    Selection.ClearContents
+    Selection.ClearFormats
+    ThisWorkbook.Worksheets("SAP DAILY BALANCE").Cells.Clear
+    
+    'MsgBox ("CLEAR SUCCESSFUL")
+    ThisWorkbook.Worksheets("Config").Activate
+
+End Sub
+
+‘********************Drop Down Value****************
+Sub tb_enter(N As String)
+
+    With SAPGLTOOL
+        If .Controls(N).Value = .Controls(N).Tag Then
+           .Controls(N).Value = vbNullString
+        End If
+    End With
+End Sub
+
+Sub tb_exit(N As String)
+
+    With SAPGLTOOL
+        If .Controls(N).Value = 0 Then
+           .Controls(N).Value = .Controls(N).Tag
+        End If
+    End With
+End Sub
+
+‘**************Progress Bar*********************
+Function ProgressBar_Part1()
+
+Application.Wait (Now + TimeValue("00:00:02"))
+Dim rm As Long
+Dim p As Long, br As Long
+rm = 0
+'Progress_Bar.Show
+For p = 0 To 50
+    PGBAR.PGBAROUT.Width = PGBAR.PGBAROUT.Width + 1
+    If p Mod 2 = 0 Then
+        rm = rm + 1
+        PGBAR.Text.Caption = rm - 1 & "% Completed"
+        'Progress_Bar.Label3.Caption = rm - 1 & "%"
+    End If
+    
+    For br = 1 To 600
+        DoEvents
+    Next br
+        
+Next p
+
+End Function
+
+Function ProgressBar_Part2()
+
+Application.Wait (Now + TimeValue("00:00:02"))
+Dim rm As Long
+Dim p As Long, br As Long
+rm = 25
+'Progress_Bar.Show
+
+For p = 50 To 100
+    PGBAR.PGBAROUT.Width = PGBAR.PGBAROUT.Width + 1
+    If p Mod 2 = 0 Then
+        rm = rm + 1
+        PGBAR.Text.Caption = rm - 1 & "% Completed"
+        'Progress_Bar.Label3.Caption = rm - 1 & "%"
+    End If
+
+    For br = 1 To 600
+        DoEvents
+    Next br
+        
+Next p
+
+End Function
+
+Function ProgressBar_Part3()
+
+Application.Wait (Now + TimeValue("00:00:02"))
+Dim rm As Long
+Dim p As Long, br As Long
+rm = 50
+'Progress_Bar.Show
+For p = 100 To 150
+    PGBAR.PGBAROUT.Width = PGBAR.PGBAROUT.Width + 1
+    If p Mod 2 = 0 Then
+        rm = rm + 1
+        PGBAR.Text.Caption = rm - 1 & "% Completed"
+        'Progress_Bar.Label3.Caption = rm - 1 & "%"
+    End If
+    
+    For br = 1 To 600
+        DoEvents
+    Next br
+        
+Next p
+
+End Function
+
+Function ProgressBar_Part4()
+
+Application.Wait (Now + TimeValue("00:00:02"))
+Dim rm As Long
+Dim p As Long, br As Long
+rm = 75
+'Progress_Bar.Show
+For p = 150 To 200
+   PGBAR.PGBAROUT.Width = PGBAR.PGBAROUT.Width + 1
+    If p Mod 2 = 0 Then
+       rm = rm + 1
+        PGBAR.Text.Caption = rm - 1 & "% Completed"
+        'Progress_Bar.Label3.Caption = rm - 1 & "%"
+    End If
+    
+    For br = 1 To 600
+        DoEvents
+    Next br
+        
+Next p
+
+End Function
+
+Thanks & Regards
+
+Arijit Bhattacharjee
+Cognizant
+AIG ELC Application QA Offshore
+Cognizant GTP Campus - Bantala, 
+Karaidanga, Gangapur,
+West Bengal – 743502, India
+Office Extension: 972-368-9300 x 317134
+Cell: +91 9830828869
+arijit.bhattacharjee@aig.com
+
+
+
