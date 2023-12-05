@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="uft-8">
+    <title>Chatbot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='Style.css')}}">
+</head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <!--<script src="C:\\PYTHON\\COMP_SUMMARY_DETAILS\\static\\Script.js" type="text\javascript"></script>-->
+</head>
+
+<style>
+    html, body {
+        min-height: 100%;
+    }
+    #main-block {
+        width: 50%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        width: 100%;
+        padding: 100px;
+    }
+    .left-part, form {
+        padding: 10px;
+    }
+    .left-part {
+        text-align: center;
+    }
+    .fa-graduation-cap {
+        font-size: 52px;
+    }
+    #userform {
+        width: 40%;
+        background: rgba(0, 0, 0, 0.7); 
+    }
+    h2 {
+        align-items: center;
+        color: #eee;
+        font-size: 20px;
+    }
+    .title {
+        align-items: center;
+        display: flex;
+        margin-bottom: 5px;
+    }
+    .info {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    input, select {
+        padding: 5px;
+        margin-bottom: 20px;
+        background: transparent;
+        border: none;
+        border-bottom: 2px solid #eee;
+    }
+    .envirnmnt {
+        align-items: center;
+        color: #eee;
+    }
+    .Pfquency {
+        align-items: center;
+        color: #eee;
+    }
+    .period {
+        align-items: center;
+        color: #eee;
+    }
+    input::placeholder {
+        align-items: center;
+        color: #eee;
+    }
+    .checkbox {
+        align-items: center;
+        color: #eee;
+        font-size: 12px;
+    }
+    .btn-item, button {
+        align-items: center;
+        padding: 10px 25px;
+        margin-top: 20px;
+        border-radius: 5px; 
+        border: none;
+        background: #26a9e0; 
+        text-decoration: none;
+        font-size: 15px;
+        font-weight: 400;
+        color: #fff;
+    }
+    option {
+        align-items: center;
+        background: black; 
+        border: none;
+    }
+    .checkbox input {
+        align-items: center;
+        margin: 0 10px 0 0;
+        vertical-align: middle;
+    }
+    .checkbox a {
+        align-items: center;
+        color: #26a9e0;
+    }
+    .checkbox a:hover {
+        color: #85d6de;
+    }
+    .btn-item {
+        display: inline-block;
+        margin: 20px 5px 0;
+    }
+    button {
+        width: 50%;
+    }
+    button:hover, .btn-item:hover {
+        background: #85d6de;
+    }
+    #main-block {
+        flex-direction: row;
+        height: calc(100% - 40px);
+    }
+    left-part, form {
+        flex: .2;
+        height: auto;
+    }
+</style>
+
+<style>
+    body{
+    background: url('static/image.webp') center center;
+    }
+</style>
+
+<body >
+    <button class="Chatbot-togger1" onclick="Chatbot_Open()">
+        <span id="Open" class="material-symbols-outlined">smart_toy</span>
+    </button>
+
+    <button class="Chatbot-togger2" onclick="Chatbot_Close()">
+        <span id="Close" class="material-symbols-outlined">close</span>
+    </button>
+    <div id="main-block">
+        <form autocomplete="off"  id="userform" action="." method="post">
+          <div class="title">
+            <i class="fas fa-pencil-alt"></i> 
+            <h2>COMMISSION FORM</h2>
+          </div>
+          <div class="info">
+              <select class="Pfquency" name="frq" id="frq" required>
+                  <option value="frq-type" selected disabled>FREQUENCY TYPE*</option>
+                  <option value="weeklyfrq">WEEKLY</option>
+                  <option value="monthlyfrq">MONTHLY</option>
+                  <option value="yearlyfrq">YEARLY</option>
+              </select>
+              <select class="envirnmnt" name="envmnt" id="envmnt" required>
+                  <option value="env-type" selected disabled>ENVIRONMENT*</option>
+                  <option value="sit">SIT</option>
+                  <option value="pat">PAT</option>
+              </select>
+            <input class="period" name="prd" id="prd" placeholder="PERIOD*" required>
+          </div>
+          <div class="checkbox">
+            <input type="checkbox" name="checkbox" selected required><span>I agree to extract the report.</a></span>
+          </div>
+          <button class="submitdetails" type="submit" >SUBMIT</button>
+        </form>
+      </div>
+        
+    <div id="Chatbot">
+        <header>
+            <h2> Chatbot App</h2>
+        </header>
+        <ul id="botText">
+            <li id="chat_incoming">
+                <span class="material-symbols-outlined">smart_toy</span>
+                <p id="initialbot"> Hi there !! how may i help you ?</p>
+            </li>
+            <li id='chat_outgoing'>
+
+            </li>
+        </ul>
+        <div id="userInput">
+            <input id="textInput" type="text" name="userMessage" placeholder=" Type your message"></textarea>
+            <span id="buttonInput" class="material-symbols-outlined" type="submit">Send</span>
+        </div>
+    </div>
+
+    <script>
+    
+    var div=document.getElementById("main-block");
+            var display=1;
+            div.style.display='none';
+            display=0;
+    function getUserResponse(){
+        var userText = $('#textInput').val();
+        console.log(userText)
+            var userHTML="<br><p id='incoming'><span>"+userText+"</span></p></br>";
+            $('#textInput').val("");
+            $('#botText').append(userHTML);
+            if (userText.search("Payment") != -1){
+                var display=0;
+                div.style.display='block';
+                display=1;
+            }
+            else if (userText.search("payment") != -1){
+                var display=0;
+                div.style.display='block';
+                display=1;
+            }
+            else if (userText.search("PAYMENT") != -1){
+                var display=0;
+                div.style.display='block';
+                display=1;
+            }
+            
+        $.get("/get",{userMessage: userText}).done(function(data){
+            console.log(data)
+            var botHTML = "<br><p id='outgoing'><span>"+data+"</span></p></br>";
+            $('#botText').append(botHTML);
+            });
+        }
+
+        $("#textInput").keypress(function(e){
+            if(e.which == 13){
+                getUserResponse();
+            }
+        });
+
+        $("#buttonInput").click(function(){
+                getUserResponse() ;
+        });
+
+    function Chatbot_Open(){
+        var div=document.getElementById("Chatbot");
+        var display=0;
+        div.style.display='block';
+        display=1;
+    }
+    
+    function Chatbot_Close(){
+        var div=document.getElementById("Chatbot");
+        var display=1;
+        div.style.display='none';
+        display=0;
+    }
+       
+</Script>
+</body>
+</html>
